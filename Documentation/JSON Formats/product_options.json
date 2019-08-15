@@ -1,0 +1,36 @@
+[
+    {
+        "color": "red",
+        "details": [
+            {
+                "size": "xl",
+                "quantity": 199
+            },
+            {
+                "size": "md",
+                "quantity": 89
+            },
+            {
+                "size": "xs",
+                "quantity": 29
+            }
+        ]
+    },
+    {
+        "color": "blue",
+        "details": [
+            {
+                "size": "xxl",
+                "quantity": 99
+            },
+            {
+                "size": "md",
+                "quantity": 8
+            },
+            {
+                "size": "sm",
+                "quantity": 25
+            }
+        ]
+    }
+]

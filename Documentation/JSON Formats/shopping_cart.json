@@ -1,0 +1,14 @@
+[
+    {
+        "product_id": 100,
+        "product_color": "string",
+        "product_size": "string",
+        "product_quantity": 5
+    },
+    {
+        "product_id": 990,
+        "product_color": "string",
+        "product_size": "string",
+        "product_quantity": 7
+    }
+]
