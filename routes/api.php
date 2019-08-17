@@ -2,8 +2,6 @@
 
 use Illuminate\Http\Request;
 
-//require("../misc/functions.php");
-use Misc\Functions as MiscFunctions;
 
 /*
 |--------------------------------------------------------------------------
