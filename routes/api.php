@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 
+//require("../misc/functions.php");
+use Misc\Functions as MiscFunctions;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -15,4 +18,17 @@ use Illuminate\Http\Request;
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::get('test', function(Request $request){
+    //$customer= factory(App\Customer::class)->create();
+    //$customer->dd();
+    $customers= App\Customer::all();
+    $customers->dd();
+
+    //$product= factory(App\Product::class)->create();
+    $products= App\Product::all();
+    $products->dd();
+
+    //echo MiscFunctions\getSection();
 });

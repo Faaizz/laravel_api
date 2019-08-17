@@ -11,6 +11,7 @@
 **description** LONGTEXT    NOT NULL  
 **section** STRING(100) NOT NULL  
 **sub_section** STRING(50)  NOT NULL  
+**category** STRING(50)  NOT NULL  
 **price**   DOUBLE(12,2) NOT NULL  
 **material**    STRING(50)  NOT NULL  
 **images**  JSON NOT NULL  
@@ -35,7 +36,7 @@
 **first_name**  STRING(50) NOT NULL  
 **last_name**  STRING(50) NOT NULL  
 **email**  STRING(100) NOT NULL  
-**password**    *DO NOT KNOW HOW TO IMPLEMENT THIS YET*  
+**password**    LONGTEXT  NOT NULL  
 **address**  LONGTEXT  NOT NULL  
 **gender**  ENUM("male", "female") NOT NULL  
 **phone_numbers**  JSON  NOT NULL  
@@ -43,14 +44,14 @@
 **newsletters**  ENUM("yes", "no") NOT NULL  DEFAULT "yes"   
 **shopping_cart**  JSON  
 **liked_items**  JSON  
-**remember_token**    *DO NOT KNOW HOW TO IMPLEMENT THIS YET*    
+**remember_token**   LONGTEXT         
 
 ## staffs  
 **id**  BIGINT  UNSIGNED  NOT NULL  AUTO_INCREMENT  PRIMARY KEY  
 **first_name**  STRING(50) NOT NULL  
 **last_name**  STRING(50) NOT NULL  
 **email**  STRING(100) NOT NULL  
-**password**    *DO NOT KNOW HOW TO IMPLEMENT THIS YET*  
+**password**      LONGTEXT  NOT NULL     
 **address**  LONGTEXT  NOT NULL  
 **gender**  ENUM("male", "female") NOT NULL  
 **phone_numbers**  JSON  NOT NULL   
