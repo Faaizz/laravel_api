@@ -21,12 +21,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('test', function(Request $request){
     //$customer= factory(App\Customer::class)->create();
     //$customer->dd();
-    $customers= App\Customer::all();
-    $customers->dd();
+    //$customers= App\Customer::all();
+    //$customers->dd();
 
     //$product= factory(App\Product::class)->create();
     $products= App\Product::all();
-    $products->dd();
+    
+    return response()->json($products, 200);
 
     //echo MiscFunctions\getSection();
 });

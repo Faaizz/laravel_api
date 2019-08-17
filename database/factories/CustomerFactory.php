@@ -4,7 +4,9 @@
 
 use App\Customer;
 use Faker\Generator as Faker;
-use Misc\Functions as MiscFunctions;
+
+//The source php file is required from "DatabaseSeede.php"
+use Storage\Misc\Functions as MiscFunctions;
 
 $factory->define(Customer::class, function (Faker $faker) {
 
