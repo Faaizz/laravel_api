@@ -18,6 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
 Route::get('test', function(Request $request){
     //$customer= factory(App\Customer::class)->create();
     //$customer->dd();
@@ -25,7 +26,7 @@ Route::get('test', function(Request $request){
     //$customers->dd();
 
     //$product= factory(App\Product::class)->create();
-    $products= App\Product::all();
+    $products= App\Product::all()->pluck('name');
     
     return response()->json($products, 200);
 
