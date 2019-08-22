@@ -6,9 +6,13 @@ use Illuminate\Http\Request;
 
 use App\Product;
 
+use App\Order;
+
 use Illuminate\Support\Carbon;
 
 use Illuminate\Support\Facades\Validator;
+
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -207,6 +211,12 @@ class ProductController extends Controller
                             'type' => 'string'
                         ],
 
+                        'material' => [
+                            'required' => false,
+                            'description' => 'Product material',
+                            'type' => 'string'
+                        ],
+
                         'min_price' => [
                             'required' => false,
                             'description' => 'Higher price limit',
@@ -367,7 +377,7 @@ class ProductController extends Controller
 
                 [
                     'path' => '/{id}',
-                    'method' => 'PUT',
+                    'method' => 'PUT. NOTE: You have to use POST and then include a "_method: PUT" header',
                     'description' => 'Edit Product and return updated details of the edited product',
                     'args' => [
 
@@ -664,6 +674,29 @@ class ProductController extends Controller
      */
     public function search(Request $request){
 
+        //VALIDATE SEARCH DATA
+        $rules= [
+            'name' => 'max:100|string',
+            'brand' => 'max:100|string',
+            'section' => 'max:100|string',
+            'sub_section' => 'max:50|string',
+            'category' => 'max:50|string',
+            'min_price' => 'numeric',
+            'max_price' => 'numeric',
+            'color' => 'max:50|string',
+            'material' => 'max:50|string'
+        ];
+
+        $request_validator= Validator::make($request->all(), $rules);
+
+        //FAILED VALIDATION
+        if($request_validator->fails()){
+            return response()->json($request_validator->errors() ,401);
+        }
+
+
+        //SUCCESS VALIDATION
+
         $section= $request->get('section');
         $sub_section= $request->get('sub_section');
         $category= $request->get('category');
@@ -672,6 +705,11 @@ class ProductController extends Controller
         //if no color is specified, set to empty string
         if(!$color)
             $color= '';
+
+        $material= $request->get('material');
+        //if no material is specified, set to empty string
+        if(!$material)
+            $material= '';
 
         $min_price= $request->get('min_price');
         //convert to double
@@ -705,7 +743,7 @@ class ProductController extends Controller
 
 
         //CATEGORY ARRAY
-        $search_array= [];
+        $category_array= [];
 
         if($section)
             $category_array['section']= $section;
@@ -774,7 +812,7 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'color' => 'required|max:50|string',
             'material' => 'required|max:50|string',
-            'size_and_quantity' => 'required|max:100|JSON',
+            'size_and_quantity' => 'required|JSON',
             'image_one' => 'required|mimes:jpeg,gif,png',
             'image_two' => 'required|mimes:jpeg,gif,png',
             'image_three' => 'required|mimes:jpeg,gif,png',
@@ -837,7 +875,7 @@ class ProductController extends Controller
         $new_product->sub_section= $request->get('sub_section');
         $new_product->category= $request->get('category');
         $new_product->color= $request->get('color');
-        $new_product->price= $request->get('price');
+        $new_product->price= doubleval($request->get('price'));
         $new_product->material= $request->get('material');
         $new_product->size_and_quantity= $request->get('size_and_quantity');
         $new_product->images= json_encode($images);
@@ -850,6 +888,324 @@ class ProductController extends Controller
         ], 201);
 
         
+    }
+
+
+    /**
+     * Update an existing product
+     * 
+     * @param int $id
+     * @param string $name
+     * @param string $brand
+     * @param string $description
+     * @param string $section
+     * @param string $sub_section
+     * @param string $category
+     * @param string $color
+     * @param double $price
+     * @param string $material
+     * @param array $size_and_quantity
+     * @param image $image_one  
+     * @param image $image_two 
+     * @param image $image_three
+     * 
+     * @return Response JSON formatted response with id and details of the newly added product
+     * 
+     */
+    public function update(Request $request, $id){
+
+        //VALIDATION
+        $rules= [
+            'id' => 'digit',
+            'name' => 'max:100|string',
+            'brand' => 'max:50|string',
+            'description' => 'string',
+            'section' => 'max:100|string',
+            'sub_section' => 'max:50|string',
+            'category' => 'max:50|string',
+            'price' => 'numeric',
+            'color' => 'max:50|string',
+            'material' => 'max:50|string',
+            'size_and_quantity' => 'max:100|JSON',
+            'image_one' => 'mimes:jpeg,gif,png',
+            'image_two' => 'mimes:jpeg,gif,png',
+            'image_three' => 'mimes:jpeg,gif,png',
+        ];
+
+        $request_validator= Validator::make($request->all(), $rules);
+
+        //FAILED VALIDATION
+        if($request_validator->fails()){
+            return response()->json($request_validator->errors(), 401);
+        }
+
+
+        //SUCCESS VALDATION
+
+        //CHECK IF PRODUCT ID IS VALID AND PULL THE PRODUCT FROM DATABASE
+        $product= Product::find($id);
+
+        //PRODUCT NOT FOUND
+        if(!$product)
+            return response()->json( [
+                'error' => 'Product with id= ' . $request->id . ' not found'
+            ] ,404);
+
+        
+        //UPDATE PRODUCT FIELDS IF NEW VALUES EXIST IN THE REQUEST
+
+        //Name
+        $buffer= $request->get('name');
+
+        if($buffer){
+            $product->name= $buffer;
+        }
+
+        //brand
+        $buffer= $request->get('brand');
+
+        if($buffer){
+            $product->brand= $buffer;
+        }
+
+        //description
+        $buffer= $request->get('description');
+
+        if($buffer){
+            $product->description= $buffer;
+        }
+
+        //section
+        $buffer= $request->get('section');
+
+        if($buffer){
+            $product->section= $buffer;
+        }
+
+        //sub_section
+        $buffer= $request->get('sub_section');
+
+        if($buffer){
+            $product->sub_section= $buffer;
+        }
+
+        //category
+        $buffer= $request->get('category');
+
+        if($buffer){
+            $product->category= $buffer;
+        }
+
+        //color
+        $buffer= $request->get('color');
+
+        if($buffer){
+            $product->color= $buffer;
+        }
+
+        //price
+        $buffer= $request->get('price');
+
+        if($buffer){
+            $product->price= doubleval($buffer);
+        }
+
+        //material
+        $buffer= $request->get('material');
+
+        if($buffer){
+            $product->material= $buffer;
+        }
+
+        //Validate "size_and_quantity" JSON array
+        $buffer= $request->get('size_and_quantity');
+
+        if($buffer){
+
+            $valid_size_and_quantity= false;
+
+            foreach($buffer as $a_s_and_q){
+                //check size string
+                if( !isset($a_s_and_q->size) | !isset($a_s_and_q->quantity) ){
+                    //if 'size' OR 'quantity' attribute does not exist, set validity to false and exit loop
+                    $valid_size_and_quantity= false;
+                    break;
+                }
+
+                //if 'quanity' is a valid integer
+                if (filter_var($a_s_and_q->quantity, FILTER_VALIDATE_INT))
+                    $valid_size_and_quantity= true;
+
+            }
+
+
+            //CHECK FOR 'size_and_quantity' VALIDATION
+            if(!$valid_size_and_quantity){
+                return response()->json( [
+                    'size_and_quantity' => 'A valid JSON array of objects with "size" and "quantity fileds is required"'
+                ] ,401);
+            }
+
+            //IF VALID
+            if($valid_size_and_quantity){
+                $product->size_and_quantity= $buffer;
+            }
+
+        }
+
+        //Images
+        //Get current image JSON
+        $images= json_decode($product->images);
+
+        //image_one
+        $buffer= $request->file('image_one');
+
+        if($buffer){
+            //save new image
+            $new_image= $buffer->store('products');
+
+            //delete existing image
+            Storage::delete($images[0]);
+
+            $images[0]= $new_image;
+        }
+
+        //image_two
+        $buffer= $request->file('image_two');
+
+        if($buffer){
+            //save new image
+            $new_image= $buffer->store('products');
+
+            //delete existing image
+            Storage::delete($images[1]);
+
+            $images[1]= $new_image;
+        }
+
+        //image_three
+        $buffer= $request->file('image_three');
+
+        if($buffer){
+            //save new image
+            $new_image= $buffer->store('products');
+
+            //delete existing image
+            Storage::delete($images[2]);
+
+            $images[2]= $new_image;
+        }
+
+        //Update product images
+        $product->images= json_encode($images);
+
+
+        //WRITE TO DATABASE
+        $product->save();
+
+        return response()->json( [
+            'message' => 'Product updated sucessfully',
+            'details' => $product
+        ],200);
+
+    }
+
+
+    /**
+     * Delete a product
+     * 
+     * @param int $id
+     * 
+     * @return Response JSON response
+     */
+    public function delete($id){
+
+        //Pull product to delete
+        $product= Product::find($id);
+
+        //if product doesn't exist, return an error
+        if(!$product){
+            return response()->json( [
+                'error' => "Product with id= " . $id . " not found"
+            ], 404);
+        }
+
+        //Delete product
+        $product->delete();
+
+        return response()->json([], 204);
+
+    }
+
+    /**
+     * Delete a product
+     * 
+     * @param int $ids
+     * 
+     * @return Response JSON response
+     */
+    public function massDelete(Request $request){
+
+        //VALIDATION
+        $rules= [
+            'ids' => 'required|JSON'
+        ];
+
+        $request_validator= Validator::make($request->all(), $rules);
+
+        //FAILED VALIDATION
+        if($request_validator->fails()){
+            return response()->json($request_validator->errors(), 404);
+        }
+
+        //Pull products to delete
+        $ids= json_decode($request->get('ids'));
+
+        $products= Product::find($ids);
+
+        //if number of matched product does not equal number of passed ids, return an error
+        if($products->count() != \count($ids)){
+
+            //check for missing products
+            $missing= [];
+            
+            foreach($ids as $id){
+
+                if(!$products->find($id)){
+                    \array_push($missing, $id);
+                }
+                
+            }
+
+            //return response with missing product ids
+            return response()->json( [
+                'error' => "Product(s) with ids= " . json_encode($missing) . " not found"
+            ], 404);
+        }
+
+        
+        //Delete products
+        $errors= [];
+        foreach($products as $product){
+
+            //check for existing orders
+            $orders= Order::where('product_id', $product->id)->get();
+
+            if($orders->count() > 0){
+                $errors[$product->id]= 'Could not delete! Product has existing orders';
+                continue;
+            }
+
+            $product->delete();
+        }
+
+        //if errors
+        if($errors){
+            return response()->json( $errors ,401);
+        }
+
+        return response()->json([], 204);
+
     }
 
 }

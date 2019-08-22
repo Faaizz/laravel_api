@@ -15,22 +15,12 @@ use Illuminate\Http\Request;
 */
 
 Route::get('test', function(Request $request){
-   //DELETE IMAGES
-   $images_arrays= DB::table('products')->pluck('images');
-   $images_array= $images_arrays->flatten();
+   
+    $orders= App\Order::where('product_id', 19)->delete();
 
-   $string= "";
-
-   foreach($images_array as $imagepatharray){
-
-       $imagepatharray= json_decode($imagepatharray);
-
-       foreach($imagepatharray as $imagepath){
-            Storage::delete($imagepath);
-       }
-   }
-
-   //return response()->json($string, 200);
+    $orders= App\Order::where('product_id', 19)->get();
+    
+   return response()->json($orders, 200);
 });
 
 
@@ -89,7 +79,7 @@ Route::middleware('auth:api')->post('/products', 'ProductController@store');
 /* U    P   D   A   T   E */
 
 //UPDATE PRODUCT
-Route::middleware('auth:api')->put('/products/{id}', 'ProductController@update')
+Route::middleware('auth:api')->post('/products/{id}', 'ProductController@update')
         ->where(
             'id', '[0-9]+'
         );
@@ -104,4 +94,4 @@ Route::middleware('auth:api')->delete('/products/{id}', 'ProductController@delet
         );
 
 //DELETE MULTIPLE
-Route::middleware('auth:api')->post('/products/mass_delete', 'ProductController@mass_delete');
+Route::middleware('auth:api')->post('/products/mass_delete', 'ProductController@massDelete');
