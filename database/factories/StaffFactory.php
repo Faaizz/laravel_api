@@ -4,6 +4,7 @@
 
 use App\Staff;
 use Faker\Generator as Faker;
+use Illuminate\Support\Str;
 
 //The source php file is required from "DatabaseSeede.php"
 use Storage\Misc\Functions as MiscFunctions;
@@ -22,6 +23,7 @@ $factory->define(Staff::class, function (Faker $faker) {
                 '+234' . $faker->randomNumber(8),
                 '+234' . $faker->randomNumber(8)
             ]
-            )
+            ),
+        'api_token' => Str::random(60)
     ];
 });

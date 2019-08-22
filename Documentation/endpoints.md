@@ -7,9 +7,7 @@
 #### Browse  
 all products  
 new in  
-by section  
-by section & sub_section  
-by section & sub_section & category  
+by section & or sub_section & or category  
 by search  
   
 #### Read  

@@ -27,9 +27,10 @@ class AddTables extends Migration
             $table->string('sub_section', 50);
             $table->string('category', 50);
             $table->double('price', 12, 2);
+            $table->string('color', 50);
             $table->string('material', 50);
             $table->json('images');
-            $table->json('options');
+            $table->json('size_and_quantity');
             $table->timestamps();
         });
     
@@ -51,7 +52,8 @@ class AddTables extends Migration
             $table->string('first_name', 50);
             $table->string('last_name', 50);
             $table->string('email', 100);
-            $table->longText('password');
+            $table->string('password');
+            $table->string('remember_token', 100)->nullable();
             $table->longText('address');
             $table->enum('gender', ['male', 'female']);
             $table->json('phone_numbers');
@@ -59,7 +61,6 @@ class AddTables extends Migration
             $table->enum('newsletters', ['yes', 'no'])->defualt('yes');
             $table->json('shopping_cart')->nullable();
             $table->json('liked_items')->nullable();
-            $table->longText('remember_token')->nullable();
             $table->timestamps(); 
             
         });
@@ -95,7 +96,9 @@ class AddTables extends Migration
             $table->string('first_name', 50);
             $table->string('last_name', 50);
             $table->string('email', 100);
-            $table->longText('password');
+            $table->string('password');
+            $table->string('remember_token', 100)->nullable();
+            $table->string('api_token', 80)->nullable();
             $table->longText('address');
             $table->enum('gender', ['male', 'female']);
             $table->json('phone_numbers');
@@ -114,6 +117,20 @@ class AddTables extends Migration
     public function down()
     {
         Schema::dropIfExists('orders');
+        //DELETE IMAGES
+        $images_arrays= DB::table('products')->pluck('images');
+        $images_array= $images_arrays.flatten();
+
+        foreach($images_array as $imagepatharray){
+
+            $imagepatharray= json_decode($imagepatharray);
+     
+            foreach($imagepatharray as $imagepath){
+                 Storage::delete($imagepath);
+            }
+        }
+
+
         Schema::dropIfExists('products');
         Schema::dropIfExists('settings');
         Schema::dropIfExists('customers');

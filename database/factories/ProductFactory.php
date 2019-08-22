@@ -23,11 +23,12 @@ $factory->define(Product::class, function (Faker $faker) {
         'sub_section'=> $sub_section,
         'category' => $category,
         'price'=> $faker->randomFloat(2),
+        'color'=> $faker->colorName,
         'material'=> $faker->word,
         'images'=> json_encode(
             []
         ),
-        'options'=> json_encode(
+        'size_and_quantity'=> json_encode(
             []
         )
 

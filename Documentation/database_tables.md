@@ -36,22 +36,24 @@
 **first_name**  STRING(50) NOT NULL  
 **last_name**  STRING(50) NOT NULL  
 **email**  STRING(100) NOT NULL  
-**password**    LONGTEXT  NOT NULL  
+**password**      STRING  NOT NULL       
+**remember_token**  STRING(100)  NULL   
 **address**  LONGTEXT  NOT NULL  
 **gender**  ENUM("male", "female") NOT NULL  
 **phone_numbers**  JSON  NOT NULL  
 **activation_status**  ENUM("yes", "no") NOT NULL  DEFAULT "no"  
 **newsletters**  ENUM("yes", "no") NOT NULL  DEFAULT "yes"   
 **shopping_cart**  JSON  
-**liked_items**  JSON  
-**remember_token**   LONGTEXT         
+**liked_items**  JSON       
 
 ## staffs  
 **id**  BIGINT  UNSIGNED  NOT NULL  AUTO_INCREMENT  PRIMARY KEY  
 **first_name**  STRING(50) NOT NULL  
 **last_name**  STRING(50) NOT NULL  
 **email**  STRING(100) NOT NULL  
-**password**      LONGTEXT  NOT NULL     
+**password**      STRING  NOT NULL     
+**remember_token**  STRING(100)  NULL  
+**api_token**   STRING(80)  UNIQUE    
 **address**  LONGTEXT  NOT NULL  
 **gender**  ENUM("male", "female") NOT NULL  
 **phone_numbers**  JSON  NOT NULL   

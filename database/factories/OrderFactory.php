@@ -12,11 +12,11 @@ $factory->define(Order::class, function (Faker $faker) {
 
     return [
         
-        'product_id' => rand(1, 200),
+        'product_id' => rand(1, 300),
         'product_color' => $faker->colorName,
         'product_size' => $productSizes[ rand(0, (count($productSizes) - 1) )],
         'product_quantity' => $faker->randomDigit,
-        'customer_id' => rand(1, 150),
+        'customer_id' => rand(1, 50),
         
     ];
 });
