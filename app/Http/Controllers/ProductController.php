@@ -20,7 +20,7 @@ class ProductController extends Controller
     /**
      * Returns available endpoints and their descriptions and required arguments
      *  
-     * @return Response JSON formatted response
+     * @return JSON JSON formatted response
      */
     public function options(){
 
@@ -44,16 +44,19 @@ class ProductController extends Controller
                     'path' => '/',
                     'method' => 'OPTIONS',
                     'description' => 'returns available methods',
+                    'authentication' => [],
                     'args' => [
 
                     ],
-                    'return_type' => 'json'
+                    'return_type' => 'json',
+                    'return_structure' => null
                 ],
 
                 [
                     'path' => '/{section?}/{sub_section?}/{category?}',
                     'method' => 'GET',
                     'description' => 'Returns matched products',
+                    'authentication' => [],
                     'args' => [
 
                         'section' => [
@@ -87,7 +90,7 @@ class ProductController extends Controller
                             'price' => 'double',
                             'color' => 'string',
                             'material' => 'string',
-                            'images' => 'array',
+                            'images' => 'array["string"]',
                             'options' => 'array',
                             'created_at' => 'string',
                             'updated_at' => 'string'
@@ -100,6 +103,7 @@ class ProductController extends Controller
                     'path' => '/products/new_in/{weeks?}/{section?}/{sub_section?}/{category?}',
                     'method' => 'GET',
                     'description' => 'Returns new products',
+                    'authentication' => [],
                     'args' => [
 
                         'weeks' => [
@@ -152,6 +156,7 @@ class ProductController extends Controller
                     'path' => '/{id}',
                     'method' => 'GET',
                     'description' => 'returns product with the specified id',
+                    'authentication' => [],
                     'args' => [
                         'id' => [
                             'required' => true,
@@ -185,6 +190,7 @@ class ProductController extends Controller
                     'path' => '/search',
                     'method' => 'POST',
                     'description' => 'returns product that match the seach criteria',
+                    'authentication' => [],
                     'args' => [
 
                         'section' => [
@@ -270,6 +276,9 @@ class ProductController extends Controller
                     'path' => '/',
                     'method' => 'POST',
                     'description' => 'Add Product to database and returns details of the newly added product',
+                    'authentication' => [
+                        'token'
+                    ],
                     'args' => [
 
                         'name' => [
@@ -379,6 +388,9 @@ class ProductController extends Controller
                     'path' => '/{id}',
                     'method' => 'PUT. NOTE: You have to use POST and then include a "_method: PUT" header',
                     'description' => 'Edit Product and return updated details of the edited product',
+                    'authentication' => [
+                        'token'
+                    ],
                     'args' => [
 
                         'id' => [
@@ -494,6 +506,9 @@ class ProductController extends Controller
                     'path' => '/{id}',
                     'method' => 'DELETE',
                     'description' => 'delete product with specified id',
+                    'authentication' => [
+                        'token'
+                    ],
                     'args' => [
                         'id' => [
                             'required' => true,
@@ -502,9 +517,7 @@ class ProductController extends Controller
                         ]
                     ],
                     'return_type' => 'json',
-                    'return_data_structure' => [
-                        'message' => 'string'
-                    ]
+                    'return_data_structure' => null
 
                 ],
 
@@ -512,6 +525,9 @@ class ProductController extends Controller
                     'path' => '/mass_delete',
                     'method' => 'POST',
                     'description' => 'delete multiple products',
+                    'authentication' => [
+                        'token'
+                    ],
                     'args' => [
                         'ids' => [
                             'required' => true,
@@ -542,7 +558,7 @@ class ProductController extends Controller
      * @param string $sub_section Sub section string
      * @param string $category Category string
      * 
-     * @return Response JSON formatted response
+     * @return JSON JSON formatted response
      */
     public function index($section=null, $sub_section=null, $category=null){
 
@@ -589,9 +605,11 @@ class ProductController extends Controller
      * @param string $sub_section Sub section string
      * @param string $category Category string
      * 
-     * @return Response JSON formatted response
+     * @return JSON JSON formatted response
      */
     public function new($weeks=3, $section=null, $sub_section=null, $category=null){
+
+        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
 
         $products= null;
 
@@ -639,7 +657,7 @@ class ProductController extends Controller
      * 
      * @param int $id Product id
      * 
-     * @return Response JSON formatted response
+     * @return JSON JSON formatted response
      */
     public function show($id){
 
@@ -670,7 +688,7 @@ class ProductController extends Controller
      * @param string $brand
      * @param string $name
      * 
-     * @return Response JSON formatted response of an array of matched products
+     * @return JSON JSON formatted response of an array of matched products
      */
     public function search(Request $request){
 
@@ -782,24 +800,26 @@ class ProductController extends Controller
     /**
      * Add a new product to database
      * 
-     * @param string $name
-     * @param string $brand
-     * @param string $description
-     * @param string $section
-     * @param string $sub_section
-     * @param string $category
-     * @param string $color
-     * @param double $price
-     * @param string $material
-     * @param array $size_and_quantity
-     * @param image $image_one  
-     * @param image $image_two 
-     * @param image $image_three
+     * @param string $request->name
+     * @param string $request->brand
+     * @param string $request->description
+     * @param string $request->section
+     * @param string $request->sub_section
+     * @param string $request->category
+     * @param string $request->color
+     * @param double $request->price
+     * @param string $request->material
+     * @param array $request->size_and_quantity
+     * @param image $request->image_one  
+     * @param image $request->image_two 
+     * @param image $request->image_three
      * 
      * 
-     * @return Response JSON formatted response with id and details of the newly added product
+     * @return JSON JSON formatted response with id and details of the newly added product
      */
     public function store(Request $request){
+
+        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
 
         //VALIDATION
         $rules= [
@@ -895,24 +915,27 @@ class ProductController extends Controller
      * Update an existing product
      * 
      * @param int $id
-     * @param string $name
-     * @param string $brand
-     * @param string $description
-     * @param string $section
-     * @param string $sub_section
-     * @param string $category
-     * @param string $color
-     * @param double $price
-     * @param string $material
-     * @param array $size_and_quantity
-     * @param image $image_one  
-     * @param image $image_two 
-     * @param image $image_three
      * 
-     * @return Response JSON formatted response with id and details of the newly added product
+     * @param string $request->name
+     * @param string $request->brand
+     * @param string $request->description
+     * @param string $request->section
+     * @param string $request->sub_section
+     * @param string $request->category
+     * @param string $request->color
+     * @param double $request->price
+     * @param string $request->material
+     * @param array $request->size_and_quantity
+     * @param image $request->image_one  
+     * @param image $request->image_two 
+     * @param image $request->image_three
+     * 
+     * @return JSON JSON formatted response with id and details of the newly added product
      * 
      */
     public function update(Request $request, $id){
+
+        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
 
         //VALIDATION
         $rules= [
@@ -1116,9 +1139,11 @@ class ProductController extends Controller
      * 
      * @param int $id
      * 
-     * @return Response JSON response
+     * @return JSON JSON response
      */
     public function delete($id){
+
+        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
 
         //Pull product to delete
         $product= Product::find($id);
@@ -1140,11 +1165,13 @@ class ProductController extends Controller
     /**
      * Delete a product
      * 
-     * @param int $ids
+     * @param int $request->ids
      * 
-     * @return Response JSON response
+     * @return JSON JSON response
      */
     public function massDelete(Request $request){
+
+        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
 
         //VALIDATION
         $rules= [
@@ -1197,6 +1224,19 @@ class ProductController extends Controller
             }
 
             $product->delete();
+
+
+            /* ===TEST THIS============================================================= */
+            //verify product was sucessfully deleted
+            $product_check= Product::find($product->id);
+
+            //if product still exists
+            if($product){
+                $errors[$product->id]= 'Could not delete! an unknown error ocurred.';
+                continue;
+            }
+            /* ======================================================================= */
+
         }
 
         //if errors

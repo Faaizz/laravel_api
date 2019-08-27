@@ -48,7 +48,6 @@ class AddTables extends Migration
          * Customers Table
          */
         Schema::create('customers', function (Blueprint $table) {
-            $table->bigIncrements('id');
             $table->string('first_name', 50);
             $table->string('last_name', 50);
             $table->string('email', 100);
@@ -62,6 +61,9 @@ class AddTables extends Migration
             $table->json('shopping_cart')->nullable();
             $table->json('liked_items')->nullable();
             $table->timestamps(); 
+
+            //add primary key
+            $table->primary('email');
             
         });
 
@@ -74,7 +76,7 @@ class AddTables extends Migration
             $table->string('product_color', 100);
             $table->string('product_size', 100);
             $table->integer('product_quantity');
-            $table->unsignedBigInteger('customer_id');
+            $table->string('customer_email', 100);
             $table->unsignedBigInteger('staff_id')->nullable();
             $table->enum('status', ["pending", "delivered", "failed"])->default("pending");
             $table->dateTime('est_del_date')->comment('estimated delivery date')->nullable();
@@ -85,7 +87,7 @@ class AddTables extends Migration
 
             //Foreign keys
             $table->foreign('product_id')->references('id')->on('products');
-            $table->foreign('customer_id')->references('id')->on('customers');
+            $table->foreign('customer_email')->references('email')->on('customers');
         });
 
         /**
@@ -104,6 +106,7 @@ class AddTables extends Migration
             $table->json('phone_numbers');
             $table->enum('privilege_level', ['staff', 'admin'])->default('staff');
             $table->timestamps();
+
             
         });
 
@@ -119,7 +122,7 @@ class AddTables extends Migration
         Schema::dropIfExists('orders');
         //DELETE IMAGES
         $images_arrays= DB::table('products')->pluck('images');
-        $images_array= $images_arrays.flatten();
+        $images_array= $images_arrays->flatten();
 
         foreach($images_array as $imagepatharray){
 

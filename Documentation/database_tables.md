@@ -23,7 +23,7 @@
 **product_color**  STRING(100) NOT NULL  
 **product_size**  STRING(50) NOT NULL  
 **product_quantity**  INT NOT NULL  
-**customer_id**  BIGINT UNSIGNED (FOREIGN KEY references **customers(_id_)**)  NOT NULL  
+**customer_email**  STRING(100) (FOREIGN KEY references **customers(_email_)**)  NOT NULL  
 **staff_id**  BIGINT UNSIGNED  
 **status**  ENUM("pending", "failed", "delivered")  NOT NULL  DEFAULT "pending"  
 **est_del_date**  DATETIME  
@@ -31,11 +31,10 @@
 **failure_date**  DATETIME
 **delivery_date**  DATETIME
 
-## customers  
-**id**  BIGINT  UNSIGNED  NOT NULL  AUTO_INCREMENT  PRIMARY KEY  
+## customers   
 **first_name**  STRING(50) NOT NULL  
 **last_name**  STRING(50) NOT NULL  
-**email**  STRING(100) NOT NULL  
+**email**  STRING(100) NOT NULL  PRIMARY KEY  
 **password**      STRING  NOT NULL       
 **remember_token**  STRING(100)  NULL   
 **address**  LONGTEXT  NOT NULL  

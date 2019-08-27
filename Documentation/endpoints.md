@@ -29,12 +29,12 @@ delete products by collection of id (returned from search)
 ## Orders  
 
 #### Browse  
-single customer orders  
-single staff orders  
-unassigned orders 
+single customer orders   
+single staff orders    
+unassigned orders   
 pending orders (assigned but not yet delivered)    
-failed orders  
-delivered orders  
+failed orders   
+delivered orders   
 
 #### Read  
 single order  
@@ -55,6 +55,7 @@ all customers
 
 #### Read  
 single customer  
+single customer (own account)  
 
 #### Edit  
 edit single customer  

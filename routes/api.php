@@ -95,3 +95,51 @@ Route::middleware('auth:api')->delete('/products/{id}', 'ProductController@delet
 
 //DELETE MULTIPLE
 Route::middleware('auth:api')->post('/products/mass_delete', 'ProductController@massDelete');
+
+
+
+/** =================================================================================================================== */
+
+/**
+ *  C  U  S  T  O  M  E  R       R   O   U   T   E   S
+ */
+
+
+
+/* O    P   T   I   O   N   S   */
+Route::options('/customers', 'CustomerController@options');
+
+
+/* L  O  G  I  N */
+Route::middleware('auth:api')->post('/customers/login', 'CustomerController@login');
+
+
+/* R   E   A   D */
+
+//ALL CUSTOMERS
+Route::middleware('auth:api')->get('/customers', 'CustomerController@index');
+
+
+//SINGLE CUSTOMER
+Route::middleware('auth:api')->get('/customers/email/{email}', 'CustomerController@show');
+
+//SINGLE CUSTOMER SELF ACCESS
+Route::middleware('auth:api')->get('/customers/my_account', 'CustomerController@self');
+
+
+/* C  R  E  A  T  E */
+
+//ADD CUSTOMER
+Route::middleware('auth:api')->post('/customers', 'CustomerController@store');
+
+
+/* U  P  D  A  T  E */
+
+//EDIT CUSTOMER
+Route::middleware('auth:api')->post('/customers/my_account', 'CustomerController@update');
+
+
+/* D  E  L  E  T  E */
+
+//DELETE CUSTOMER
+Route::middleware('auth:api')->delete('/customers/{email}', 'CustomerController@delete');

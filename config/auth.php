@@ -36,16 +36,18 @@ return [
     */
 
     'guards' => [
+
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'customers',
         ],
 
         'api' => [
             'driver' => 'token',
             'provider' => 'staffs',
             'hash' => false,
-        ],
+        ]
+
     ],
 
     /*
@@ -66,9 +68,15 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        
+        //'users' => [
+        //    'driver' => 'eloquent',
+        //    'model' => App\User::class,
+        //],
+
+        'customers' => [
             'driver' => 'eloquent',
-            'model' => App\User::class,
+            'model' => App\Customer::class,
         ],
 
         'staffs' => [

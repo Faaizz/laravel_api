@@ -13,27 +13,28 @@ class RootController extends Controller
             
             'methods' =>    [
 
-                'OPTIONS'
+                'OPTIONS',
+                'GET',
+                'POST',
+                'DELETE'
 
             ],
             
             'endpoints' => [
 
+                //PRODUCTS
                 [
+                    'path' => '/products',
                     'method' => 'OPTIONS',
+                    'description' => 'get available information about this resource'
+                ],
 
-                    'args' => [
-
-                        'arg_name' => [
-
-                            'required' => false,
-                            'description' => 'Sample template for API documentation structure',
-                            'type' => 'string'
-
-                        ]
-
-                    ]
-                ]
+                //CUSTOMERS
+                [
+                    'path' => '/customers',
+                    'method' => 'OPTIONS',
+                    'description' => 'get available information about this resource'
+                ],
 
             ]
 

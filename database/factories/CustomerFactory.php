@@ -13,8 +13,8 @@ $factory->define(Customer::class, function (Faker $faker) {
 
 
     return [
-        'first_name'=> $faker->name,
-        'last_name'=> $faker->name,
+        'first_name'=> $faker->firstName,
+        'last_name'=> $faker->lastName,
         'email'=> $faker->unique()->safeEmail,
         'password'=> $faker->text(50),
         'address'=> $faker->address,
