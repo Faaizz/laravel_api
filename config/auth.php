@@ -42,6 +42,11 @@ return [
             'provider' => 'customers',
         ],
 
+        'staffs' => [
+            'driver' => 'session',
+            'provider' => 'staffs'
+        ],
+
         'api' => [
             'driver' => 'token',
             'provider' => 'staffs',

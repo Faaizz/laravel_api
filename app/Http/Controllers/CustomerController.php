@@ -10,12 +10,13 @@ use Illuminate\Support\Facades\Auth;
 class CustomerController extends Controller
 {
 
-        /**
-     * Returns available endpoints and their descriptions and required arguments
+    /**
+     * Returns available endpoints and their descriptions, required arguments, and expected responses
      *  
      * @return JSON JSON formatted response
      */
-    public function options(){
+    public function options()
+    {
 
         return response()->json([
             
@@ -41,7 +42,7 @@ class CustomerController extends Controller
 
                     ],
                     'return_type' => 'json',
-                    'return_structure' => null
+                    'return_structure' => []
                 ],
 
                 //LOGIN
@@ -397,7 +398,6 @@ class CustomerController extends Controller
 
         
 
-        //return response()->json($customer_login, 201);
 
         //If customer is found and password is correct
         if($customer_login){
@@ -457,7 +457,7 @@ class CustomerController extends Controller
         $customer= Customer::find($email);
 
         //if customer isn't found
-        if(!$customer){
+        if( empty($customer) || $customer->count() <= 0){
             return response()->json([
                 'error' => 'Could not find any customer with email *' . $email . '*'
             ] ,404);
@@ -614,7 +614,7 @@ class CustomerController extends Controller
 
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $customer= Customer::find("fr33ziey@example.org");
+        $customer= Customer::find("alfredo.hyatt@example.net");
         Auth::guard('web')->login($customer);
         //========================================================
 

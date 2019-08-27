@@ -14,7 +14,7 @@ $factory->define(Staff::class, function (Faker $faker) {
         'first_name' => $faker-> name,
         'last_name' => $faker->name,
         'email' => $faker->unique()->email,
-        'password' => $faker->password,
+        'password' => $faker->text(50),
         'address' => $faker->address,
         'gender'=> MiscFunctions\getGender(),
         'phone_numbers'=> json_encode(

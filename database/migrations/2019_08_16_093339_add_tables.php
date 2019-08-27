@@ -77,7 +77,7 @@ class AddTables extends Migration
             $table->string('product_size', 100);
             $table->integer('product_quantity');
             $table->string('customer_email', 100);
-            $table->unsignedBigInteger('staff_id')->nullable();
+            $table->string('staff_email', 100);
             $table->enum('status', ["pending", "delivered", "failed"])->default("pending");
             $table->dateTime('est_del_date')->comment('estimated delivery date')->nullable();
             $table->dateTime('failure_date')->nullable();
@@ -94,7 +94,6 @@ class AddTables extends Migration
          * Staffs Table
          */
         Schema::create('staffs', function (Blueprint $table) {
-            $table->bigIncrements('id');
             $table->string('first_name', 50);
             $table->string('last_name', 50);
             $table->string('email', 100);
@@ -106,6 +105,9 @@ class AddTables extends Migration
             $table->json('phone_numbers');
             $table->enum('privilege_level', ['staff', 'admin'])->default('staff');
             $table->timestamps();
+
+            //add primary key
+            $table->primary('email');
 
             
         });

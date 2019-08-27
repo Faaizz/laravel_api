@@ -49,7 +49,7 @@ class ProductController extends Controller
 
                     ],
                     'return_type' => 'json',
-                    'return_structure' => null
+                    'return_structure' => []
                 ],
 
                 [

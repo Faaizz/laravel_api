@@ -143,3 +143,36 @@ Route::middleware('auth:api')->post('/customers/my_account', 'CustomerController
 
 //DELETE CUSTOMER
 Route::middleware('auth:api')->delete('/customers/{email}', 'CustomerController@delete');
+
+
+
+/** =================================================================================================================== */
+
+/**
+ *  S  T  A  F  F       R   O   U   T   E   S
+ */
+
+
+ /* O  P  T  I  O  N  S */
+ Route::options('/staff', 'StaffController@options');
+
+ /* L  O  G  I  N */
+ Route::middleware('auth:api')->post('/staff/login', 'StaffController@login');
+
+ /* R  E  A  D */
+
+ //All Staff
+ Route::middleware('auth:api')->get('/staff', 'StaffController@index');
+
+ //Single Staff
+ Route::middleware('auth:api')->get('/staff/email/{email}', 'StaffController@show');
+
+ //Single Staff Self Access
+ Route::middleware('auth:api')->get('/staff/my_account', 'StaffController@self');
+
+
+ 
+ /* D  E  L  E  T  E */
+
+//DELETE STAFF
+Route::middleware('auth:api')->delete('/staff/{email}', 'StaffController@delete');
