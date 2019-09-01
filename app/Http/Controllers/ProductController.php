@@ -260,7 +260,7 @@ class ProductController extends Controller
 
                 [
                     'path' => '/search',
-                    'method' => 'POST',
+                    'method' => 'ANY',
                     'description' => 'returns product that match the seach criteria',
                     'authentication' => [],
                     'args' => [
@@ -338,7 +338,7 @@ class ProductController extends Controller
                         'data' => [
                             [
                                 'id' => 'integer',
-                                'name' => 'srting',
+                                'name' => 'string',
                                 'brand' => 'string',
                                 'description' => 'string',
                                 'section' => 'string',

@@ -8,6 +8,7 @@ use App\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 //RESOURCES
 use App\Http\Resources\Customer as CustomerResource;
@@ -102,6 +103,7 @@ class CustomerController extends Controller
                 ],
 
                 //READ
+                //all
                 [
                     'path' => '/',
                     'method' => 'GET',
@@ -161,6 +163,99 @@ class CustomerController extends Controller
                     ]
                 ],
 
+                //search
+                [
+                    'path' => '/',
+                    'method' => 'ANY',
+                    'description' => 'Search for Customer with specified details',
+                    'authentication' => [
+                        'api' => 'token',
+                        'login' => 'staff'
+                    ],
+                    'args' => [
+
+                        'GET' => [
+                            'page' => [
+                                'required' => false,
+                                'description' => 'current page',
+                                'type' => 'integer'
+                            ]
+                        ],
+
+                        'POST' => [
+
+                            'first_name' => [
+                                'required' => false,
+                                'description' => 'First name',
+                                'type' => 'string'
+                            ],
+
+                            'last_name' => [
+                                'required' => false,
+                                'description' => 'Last name',
+                                'type' => 'string'
+                            ],
+
+                            'email' => [
+                                'required' => false,
+                                'description' => 'Email address (must be unique for all customers)',
+                                'type' => 'string'
+                            ],
+
+                            'address' => [
+                                'required' => false,
+                                'description' => 'Address',
+                                'type' => 'string'
+                            ],
+
+                            'gender' => [
+                                'required' => false,
+                                'description' => 'Gender. "male" OR "female"',
+                                'type' => 'string'
+                            ]
+
+                        ]
+
+                    ],
+                    'return_type' => 'array: json',                    
+                    'return_data_structure' => [
+
+                        'failed_validation' => [
+                            'request field' => 'validation message'
+                        ],
+                        'success' => [
+                            'data' => [
+                                [
+                                    'first_name' => 'srting',
+                                    'last_name' => 'srting',
+                                    'email' => 'string',
+                                    'address' => 'string',
+                                    'gender' => 'string',
+                                    'phone_numbers' => 'string',
+                                    'activation_status' => 'string',
+                                    'pending_orders' => 'integer'
+                                ]
+                            ],
+                            "links" => [
+                                "first" => "string",
+                                "last" => "string",
+                                "prev" => "string",
+                                "next" => "string"
+                            ],
+                            "meta" => [
+                                    "current_page" => "integer",
+                                    "from" => "integer",
+                                    "last_page" => "integer",
+                                    "path" => "string",
+                                    "per_page" => "integer",
+                                    "to" => "integer",
+                                    "total" => "integer"
+                            ]
+                        ]
+                    ]
+                ],
+
+                //single by email
                 [
                     'path' => '/email/{email}',
                     'method' => 'GET',
@@ -203,6 +298,7 @@ class CustomerController extends Controller
                     ]
                 ],
 
+                //self by email
                 [
                     'path' => '/my_account',
                     'method' => 'GET',
@@ -234,6 +330,7 @@ class CustomerController extends Controller
                         ]
                     ]
                 ],
+
 
                 //CREATE
                 [
@@ -435,6 +532,53 @@ class CustomerController extends Controller
     }
 
 
+     /**
+     * Login existing Customer with cookie
+     * 
+     * @return JSON JSON formatted response
+     */
+    public function cookie_login(Request $request){
+
+        //Pull "X-REMEMBER-CUSTOMER" cookie from request
+        $remember_cookie= $request->cookie('X-REMEMBER-CUSTOMER');
+
+        //If no "X-REMEMBER-CUSTOMER" token is found, redirect to /api/customer/login/manual
+        if( !$remember_cookie ){
+
+            return redirect()->route('customer_manual_login');
+
+        }
+
+
+        //Check for Customer with matching cookie
+        $customer_login= Customer::where('remember_token', $remember_cookie)->first();
+
+        //Customer not found, redirect to /api/customer/login/manual
+        if( empty($customer_login) || $customer_login->count() <= 0 ){
+
+            return redirect()->route('customer_manual_login');
+
+        }
+
+        //Attempt login
+        if($customer_login){            
+            Auth::guard('web')->login($customer_login);
+        }
+
+        //FAILED LOGIN
+        if( !Auth::guard('web')->check() ){
+            return redirect()->route('customer_manual_login');
+        }
+
+        //SUCCESS AUTHENTICATION
+        return response()->json([
+            'message' => 'Authentication Successful.'
+        ], 200);
+        
+
+    }
+
+
 
     /**
      * Logs in a Customer
@@ -507,22 +651,105 @@ class CustomerController extends Controller
         }
 
 
-        //SUCCESS AUTHENTICATION
+        //SUCCESS AUTHENTICATION       
+        
+        //If user sets "remember" to "yes", generate a cookie, store in database and send back to user
+        if( $request->remember == "yes" ){
+
+            //Generate Token
+            $token= Str::random(100);
+
+            //Add token to Staff instance
+            $customer_login->remember_token= $token;
+            $customer_login->save();
+
+            //refresh the customer instance
+            $customer_login= $customer_login->fresh();
+
+            //Verify saving success
+            $save_success= ($customer_login->remember_token == $token);
+
+            //If token was saved successfully, send as a "X-REMMEBER" cookie with the response
+            if($save_success){
+
+                return response()->json([
+                    'message' => 'Authentication Successful.'
+                ], 200)->cookie('X-REMEMBER-CUSTOMER', $token);  
+
+            }
+        }
+
+        //Otherwise
         return response()->json([
             'message' => 'Authentication Successful.'
         ], 200);
-        
         
 
     }
 
 
     /**
+     * Logout current Customer account
+     * 
+     * 
+     * @return JSON JSON formatted response
+     */
+    public function logout(){
+
+        $this->simulateCustomerLogin();
+
+        //If no user is logged in, return an error reponse
+        if ( !Auth::guard('web')->check() ){
+
+            return response()->json([
+                'error' => 'no user is logged in'
+            ], 404);
+
+        }
+
+        //If a user is currently logged in....
+        
+        //delete "remember_token"
+        $customer= Auth::guard('web')->user();
+
+        //If user can't be retrieved, return an error
+        if( !$customer || $customer->count() <= 0 ){
+
+            return response()->json( [
+                'error' => 'An unexpected error occured. Could not log out user.'
+            ],500);
+
+        }
+
+        $customer->remember_token= "";
+        $customer->save();
+
+        //Verify delete
+        $customer->fresh();
+        
+        //Unsuccessful delete
+        if( ! ($customer->remember_token == "") ){
+
+            return response()->json( [
+                'error' => 'An unexpected error occured.'
+            ],500);
+
+        }
+
+        //log out the user
+        Auth::guard('web')->logout();
+
+
+    }
+
+
+    /**
      * Display a listing of all customers.
+     * @param string $request->per_page Number of CUstomers to dusplay per page
      *
      * @return JSON JSON formatted response
      */
-    public function index()
+    public function index(Request $request)
     {
 
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
@@ -531,6 +758,14 @@ class CustomerController extends Controller
         $this->simulateStaffLogin();
         //========================================================
 
+
+        //Set default per_page value for pagination
+        $per_page= 20;
+
+        //if a per_page parameter is included with the request, set it
+        if($request->per_page){
+            $per_page= \intval($request->per_page);
+        }
 
         
         //If no staff is not authenticated
@@ -543,7 +778,7 @@ class CustomerController extends Controller
         }
 
         //Return all Customers through the Customer Resource and paginate
-        return new CustomerCollection(Customer::paginate(20));
+        return new CustomerCollection(Customer::paginate($per_page));
 
     }
 
@@ -588,6 +823,114 @@ class CustomerController extends Controller
 
     }
 
+
+    /**
+     * Return result of Product search
+     * 
+     * @param string $email
+     * @param string $first_name
+     * @param string $last_name
+     * @param string $address
+     * @param string $gender
+     * 
+     * @param string $request->$per_page
+     * 
+     * @return JSON JSON formatted response of an array of matched products
+     */
+    public function search(Request $request){
+
+        //Set default per_page value for pagination
+        $per_page= 20;
+
+        //if a per_page parameter is included with the request, set it
+        if($request->per_page){
+            $per_page= \intval($request->per_page);
+        }
+
+
+        /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
+
+       //Simulate Admin login
+       $this->simulateStaffLogin();
+
+       //Check staff login. Return an error is no staff is authenticated
+       if(!Auth::guard('staffs')->check()){
+
+           return response()->json( [
+               'error' => 'Please login as a staff.'
+           ], 401);
+
+       }
+
+
+       //VALIDATE SEARCH DATA
+       $rules= [
+           'email' => 'max:100|string',
+           'first_name' => 'max:100|string',
+           'last_name' => 'max:100|string',
+           'address' => 'string',
+           'gender' => 'max:10|string'
+       ];
+
+       $request_validator= Validator::make($request->all(), $rules);
+
+       //FAILED VALIDATION
+       if($request_validator->fails()){
+           return response()->json($request_validator->errors() ,401);
+       }
+
+
+       //SUCCESS VALIDATION
+
+       $email= $request->get('email');
+       $first_name= $request->get('first_name');
+       $last_name= $request->get('last_name');
+       $address= $request->get('address');
+       $gender= $request->get('gender');
+
+       if ( !$email ){
+           $email= "";
+       }
+
+       if ( !$first_name ){
+           $first_name= "";
+       }
+
+       if ( !$last_name ){
+           $last_name= "";
+       }
+
+       if ( !$address ){
+           $address= "";
+       }
+
+       if ( !$gender ){
+           $gender= "";
+       }
+
+       
+       //FIND MATCHED STAFF AND PAGINATE MATCHES
+       $staff= Staff::where('email', 'like', '%'. $email . '%')
+                   ->where('first_name', 'like', '%' . $first_name . '%')
+                   ->where('last_name', 'like', '%' . $last_name . '%')
+                   ->where('address', 'like', '%' . $address . '%')
+                   ->where('gender', $gender)
+                   ->paginate($per_page);
+
+
+       //if no result is found
+       if(count($staff) == 0){
+           return response()->json([
+               'error' => 'no matches found',
+               'search_params' => $request->all()
+           ], 404);
+       }
+
+       return new CustomerCollection($staff);
+   }
+
+
+
     /**
      * Display details of the currently logged in customer.
      *
@@ -611,7 +954,7 @@ class CustomerController extends Controller
         }
 
         //Return User Data
-        return response()->json( Auth::user() , 200);
+        return new CustomerResource(Auth::user());
 
     }
 

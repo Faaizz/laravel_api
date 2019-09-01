@@ -37,10 +37,7 @@ failed orders
 delivered orders   
 
 #### Read  
-single order  
-
-#### Edit  
-edit single order  
+single order   
 
 #### Add  
 add order  
@@ -67,6 +64,11 @@ add customer
 #### Delete  
 delete customer  
 
+#### Login
+cookie login
+manual login
+logout
+
 
 </br>  
 
@@ -88,6 +90,10 @@ add staff
 #### Delete  
 delete staff  
 
+#### Login
+cookie login
+manual login
+logout
 
 </br>  
 

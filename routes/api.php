@@ -64,7 +64,8 @@ Route::get('/products/new_in/{weeeks?}/{section?}/{sub_section?}/{category?}', '
         ]);
 
 //PRODUCT SEARCH
-Route::post('/products/search', 'ProductController@search');
+ //Method set as ANY so that pagination works well
+Route::any('/products/search', 'ProductController@search');
 
 //SINGLE PRODUCT SELECT
 Route::get('/products/{id}', 'ProductController@show');
@@ -111,7 +112,14 @@ Route::options('/customers', 'CustomerController@options');
 
 
 /* L  O  G  I  N */
-Route::middleware('auth:api')->post('/customers/login', 'CustomerController@login');
+ //Cookie Login
+ Route::middleware('auth:api')->post('/customers/login', 'CustomerController@cookie_login'); 
+
+ //Manual Login
+ Route::middleware('auth:api')->post('/customers/login/manual', 'CustomerController@login')->name('customer_manual_login');
+
+  //Logout
+  Route::middleware('auth:api')->get('/customers/logout', 'CustomerController@logout'); 
 
 
 /* R   E   A   D */
@@ -125,6 +133,10 @@ Route::middleware('auth:api')->get('/customers/email/{email}', 'CustomerControll
 
 //SINGLE CUSTOMER SELF ACCESS
 Route::middleware('auth:api')->get('/customers/my_account', 'CustomerController@self');
+
+ //CUSTOMER SEARCH
+ //Method set as ANY so that pagination works well
+ Route::any('/customers/search', 'CustomerController@search');
 
 
 /* C  R  E  A  T  E */
@@ -180,7 +192,7 @@ Route::middleware('auth:api')->delete('/customers/{email}', 'CustomerController@
  Route::middleware('auth:api')->get('/staff/my_account', 'StaffController@self');
 
  //Staff SEARCH
- //Methos set as ANY so that pagination works well
+ //Method set as ANY so that pagination works well
  Route::any('/staff/search', 'StaffController@search');
 
 

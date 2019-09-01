@@ -147,10 +147,17 @@ class StaffController extends Controller
                         'login' => 'admin'
                     ],
                     'args' => [
-                        'page' => [
-                            'required' => false,
-                            'description' => 'current page',
-                            'type' => 'integer'
+                        'GET' => [
+                            'page' => [
+                                'required' => false,
+                                'description' => 'current page',
+                                'type' => 'integer'
+                            ],
+                            'per_page' => [
+                                'required' => false,
+                                'description' => 'number of staff to display per page',
+                                'type' => 'integer'
+                            ]
                         ]
                     ],
                     'return_type' => 'array: json',
@@ -159,18 +166,33 @@ class StaffController extends Controller
                             'error' => 'error message'
                         ],
                         'success' => [
-                            'array of' => [
-                                'first_name' => 'string',
-                                'last_name' => 'string',
-                                'email' => 'string',
-                                'address' => 'string',
-                                'gender' => 'string',
-                                'phone_numbers' => 'array["string"]',
-                                'privilege_level' => 'string',
-                                'pending_orders' => 'integer',
-                                'orders' => 'array[Order]'
+                            'data' => [
+                                [
+                                    'first_name' => 'string',
+                                    'last_name' => 'string',
+                                    'email' => 'string',
+                                    'address' => 'string',
+                                    'gender' => 'string',
+                                    'phone_numbers' => 'array["string"]',
+                                    'privilege_level' => 'string'
+                                ]
+                            ],
+                            "links" => [
+                                    "first" => "string",
+                                    "last" => "string",
+                                    "prev" => "string",
+                                    "next" => "string"
+                            ],
+                            "meta" => [
+                                    "current_page" => "integer",
+                                    "from" => "integer",
+                                    "last_page" => "integer",
+                                    "path" => "string",
+                                    "per_page" => "integer",
+                                    "to" => "integer",
+                                    "total" => "integer"
                             ]
-                        ]                        
+                        ]                       
                     ]
                 ],
 
@@ -248,22 +270,37 @@ class StaffController extends Controller
                     ],
                     'args' => [
 
-                        'email' => [
-                            'required' => true,
-                            'description' => 'staff section',
-                            'type' => 'string'
+                        'GET' => [
+                            'page' => [
+                                'required' => false,
+                                'description' => 'current page',
+                                'type' => 'integer'
+                            ],
+                            'per_page' => [
+                                'required' => false,
+                                'description' => 'number of staff to display per page',
+                                'type' => 'integer'
+                            ]
                         ],
 
-                        'first_name' => [
-                            'required' => true,
-                            'description' => 'staff sub section',
-                            'type' => 'string'
-                        ],
+                        'POST'  => [
+                            'email' => [
+                                'required' => true,
+                                'description' => 'staff section',
+                                'type' => 'string'
+                            ],
 
-                        'last_name' => [
-                            'required' => true,
-                            'description' => 'staff sub section',
-                            'type' => 'string'
+                            'first_name' => [
+                                'required' => true,
+                                'description' => 'staff sub section',
+                                'type' => 'string'
+                            ],
+
+                            'last_name' => [
+                                'required' => true,
+                                'description' => 'staff sub section',
+                                'type' => 'string'
+                            ]
                         ]
                     ],
                     'return_type' => 'array: json',                    
@@ -272,14 +309,31 @@ class StaffController extends Controller
                             'error' => 'error message'
                         ],
                         'success' => [
-                            'array of' => [
-                                'first_name' => 'string',
-                                'last_name' => 'string',
-                                'email' => 'string',
-                                'address' => 'string',
-                                'gender' => 'string',
-                                'phone_numbers' => 'array["string"]',
-                                'privilege_level' => 'string'
+                            'data' => [
+                                [
+                                    'first_name' => 'string',
+                                    'last_name' => 'string',
+                                    'email' => 'string',
+                                    'address' => 'string',
+                                    'gender' => 'string',
+                                    'phone_numbers' => 'array["string"]',
+                                    'privilege_level' => 'string'
+                                ]
+                            ],
+                            "links" => [
+                                    "first" => "string",
+                                    "last" => "string",
+                                    "prev" => "string",
+                                    "next" => "string"
+                            ],
+                            "meta" => [
+                                    "current_page" => "integer",
+                                    "from" => "integer",
+                                    "last_page" => "integer",
+                                    "path" => "string",
+                                    "per_page" => "integer",
+                                    "to" => "integer",
+                                    "total" => "integer"
                             ]
                         ]      
                     ]
@@ -455,7 +509,7 @@ class StaffController extends Controller
 
 
      /**
-     * Login existing Staff with cookie
+     * Login existing Staff automatically with cookie
      * 
      * @return JSON JSON formatted response
      */
@@ -473,8 +527,7 @@ class StaffController extends Controller
 
 
         //Check for Staff with matching cookie
-        $staff_login= Staff::where('remember_token', $remember_cookie)->get();
-        return response()->json($staff_login, 200);
+        $staff_login= Staff::where('remember_token', $remember_cookie)->first();
 
         //Customer not found, redirect to /api/staff/login/manual
         if( empty($staff_login) || $staff_login->count() <= 0 ){
@@ -643,7 +696,7 @@ class StaffController extends Controller
 
         //Verify delete
         $staff->fresh();
-        return response()->json( $staff, 500);
+        
         //Unsuccessful delete
         if( ! ($staff->remember_token == "") ){
 
@@ -662,11 +715,21 @@ class StaffController extends Controller
 
     /**
      * Display a listing of all staff.
+     * 
+     * @param string $request->per_page
      *
      * @return JSON JSON formatted response
      */
-    public function index()
+    public function index(Request $request)
     {
+
+        //Set default per_page value for pagination
+        $per_page= 20;
+
+        //if a per_page parameter is included with the request, set it
+        if($request->per_page){
+            $per_page= \intval($request->per_page);
+        }
         
         /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
 
@@ -694,7 +757,7 @@ class StaffController extends Controller
         }
         
         //Return a collection of all staff through the StaffCollection Resource
-        return  new StaffCollection(Staff::paginate(10));
+        return  new StaffCollection(Staff::paginate($per_page));
 
     }
 
@@ -778,15 +841,24 @@ class StaffController extends Controller
 
 
     /**
-     * Return result of Product search
+     * Return result of Staff search
      * 
      * @param string $email
      * @param string $first_name
      * @param string $last_name
+     * @param string $request->per_page
      * 
      * @return JSON JSON formatted response of an array of matched products
      */
     public function search(Request $request){
+
+        //Set default per_page value for pagination
+        $per_page= 20;
+
+        //if a per_page parameter is included with the request, set it
+        if($request->per_page){
+            $per_page= \intval($request->per_page);
+        }
 
          /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         
@@ -851,7 +923,7 @@ class StaffController extends Controller
         $staff= Staff::where('email', 'like', '%'. $email . '%')
                     ->where('first_name', 'like', '%' . $first_name. '%')
                     ->where('last_name', 'like', '%' . $last_name . '%')
-                    ->paginate(10);
+                    ->paginate($per_page);
 
 
         //if no result is found
