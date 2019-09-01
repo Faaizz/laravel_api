@@ -157,7 +157,16 @@ Route::middleware('auth:api')->delete('/customers/{email}', 'CustomerController@
  Route::options('/staff', 'StaffController@options');
 
  /* L  O  G  I  N */
- Route::middleware('auth:api')->post('/staff/login', 'StaffController@login');
+ 
+ //Cookie Login
+ Route::middleware('auth:api')->post('/staff/login', 'StaffController@cookie_login'); 
+
+ //Manual Login
+ Route::middleware('auth:api')->post('/staff/login/manual', 'StaffController@login')->name('staff_manual_login');
+
+ //Logout
+ Route::middleware('auth:api')->get('/staff/logout', 'StaffController@logout'); 
+
 
  /* R  E  A  D */
 
@@ -170,7 +179,21 @@ Route::middleware('auth:api')->delete('/customers/{email}', 'CustomerController@
  //Single Staff Self Access
  Route::middleware('auth:api')->get('/staff/my_account', 'StaffController@self');
 
+ //Staff SEARCH
+ //Methos set as ANY so that pagination works well
+ Route::any('/staff/search', 'StaffController@search');
 
+
+ /* C  R  E  A  T  E */
+ 
+ //ADD STAFF
+ Route::middleware('auth:api')->post('/staff', 'StaffController@store');
+
+
+ /* U  P  D  A  T  E */
+ 
+ //EDIT STAFF
+ Route::middleware('auth:api')->post('/staff/my_account', 'StaffController@update');
  
  /* D  E  L  E  T  E */
 

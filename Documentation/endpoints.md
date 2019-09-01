@@ -56,6 +56,7 @@ all customers
 #### Read  
 single customer  
 single customer (own account)  
+by search  
 
 #### Edit  
 edit single customer  
@@ -73,6 +74,7 @@ delete customer
 
 #### Browse  
 all staff  
+by search  
 
 #### Read  
 single staff  

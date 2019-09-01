@@ -15,5 +15,41 @@ class Order extends Model
     public function customer(){
         return $this->hasOne('App\Customer');
     }
+
+    //Return failed orders
+    public function isFailed(){
+
+        if ($this->status == "failed"){
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
+    //Return delivered orders
+    public function isDelivered(){
+
+        if ($this->status == "delivered"){
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
+    //Return pending orders
+    public function isPending(){
+
+        if ($this->status == "pending"){
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
     
 }

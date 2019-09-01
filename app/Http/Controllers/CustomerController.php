@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Customer;
+use App\Staff;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+
 
 class CustomerController extends Controller
 {
@@ -37,7 +40,9 @@ class CustomerController extends Controller
                     'path' => '/',
                     'method' => 'OPTIONS',
                     'description' => 'returns available methods',
-                    'authentication' => [],
+                    'authentication' => [
+                        'api' => 'token'
+                    ],
                     'args' => [
 
                     ],
@@ -51,7 +56,7 @@ class CustomerController extends Controller
                     'method' => 'POST',
                     'description' => 'login customer',
                     'authentication' => [
-                        'token'
+                        'api' => 'token'
                     ],
                     'args' => [
                         'email' => [
@@ -63,6 +68,12 @@ class CustomerController extends Controller
                         'password' => [
                             'required' => true,
                             'description' => 'customer password',
+                            'type' => 'string'
+                        ],
+
+                        'remember' => [
+                            'required' => false,
+                            'description' => 'Set "yes" if user wna==ants to stay logged in',
                             'type' => 'string'
                         ]
                     ],
@@ -86,23 +97,36 @@ class CustomerController extends Controller
                     'method' => 'GET',
                     'description' => 'returns all registered customers.',
                     'authentication' => [
-                        'token'
+                        'api' => 'token',
+                        'login' => 'staff'
+
                     ],
                     'args' => [
-
+                        'email' => [
+                            'required' => true,
+                            'description' => 'customer email',
+                            'type' => 'string'
+                        ]
                     ],
                     'return_type' => 'array: json',
                     'return_type' => [
-                        'first_name' => 'string',
-                        'last_name' => 'string',
-                        'email' => 'string',
-                        'address' => 'string',
-                        'gender' => 'string',
-                        'phone_numbers' => 'array["string"]',
-                        'activation_status' => 'string',
-                        'newsletters' => 'string',
-                        'shopping_cart' => 'array["products"]',
-                        'liked_items' => 'array'
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        'success' => [
+                            'array of' => [
+                                'first_name' => 'string',
+                                'last_name' => 'string',
+                                'email' => 'string',
+                                'address' => 'string',
+                                'gender' => 'string',
+                                'phone_numbers' => 'array["string"]',
+                                'activation_status' => 'string',
+                                'newsletters' => 'string',
+                                'shopping_cart' => 'array["products"]',
+                                'liked_items' => 'array'
+                            ]
+                        ]
                     ]
                 ],
 
@@ -111,7 +135,8 @@ class CustomerController extends Controller
                     'method' => 'GET',
                     'description' => 'returns customer with the specified email.',
                     'authentication' => [
-                        'token'
+                        'api' => 'token',
+                        'login' => 'staff'
                     ],
                     'args' => [
                         'email' => [
@@ -122,16 +147,21 @@ class CustomerController extends Controller
                     ],
                     'return_type' => 'json',
                     'return_type' => [
-                        'first_name' => 'string',
-                        'last_name' => 'string',
-                        'email' => 'string',
-                        'address' => 'string',
-                        'gender' => 'string',
-                        'phone_numbers' => 'array["string"]',
-                        'activation_status' => 'string',
-                        'newsletters' => 'string',
-                        'shopping_cart' => 'array["products"]',
-                        'liked_items' => 'array'
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        'success' => [
+                            'first_name' => 'string',
+                            'last_name' => 'string',
+                            'email' => 'string',
+                            'address' => 'string',
+                            'gender' => 'string',
+                            'phone_numbers' => 'array["string"]',
+                            'activation_status' => 'string',
+                            'newsletters' => 'string',
+                            'shopping_cart' => 'array["products"]',
+                            'liked_items' => 'array'
+                        ]
                     ]
                 ],
 
@@ -140,8 +170,8 @@ class CustomerController extends Controller
                     'method' => 'GET',
                     'description' => 'returns details of the logged in customer.',
                     'authentication' => [
-                        'token',
-                        'user'
+                        'api' => 'token',
+                        'login' => 'user'
                     ],
                     'args' => [
                         
@@ -172,7 +202,7 @@ class CustomerController extends Controller
                     'method' => 'POST',
                     'description' => 'Adds Customer to database and returns details of the newly added customer',
                     'authentication' => [
-                        'token'
+                        'api' => 'token'
                     ],
                     'args' => [
 
@@ -239,10 +269,10 @@ class CustomerController extends Controller
                 [
                     'path' => '/',
                     'method' => 'PUT. NOTE: You have to use POST and then include a "_method: PUT" header',
-                    'description' => 'Adds Customer to database and returns details of the newly added customer',
+                    'description' => 'Update details of the current customer',
                     'authentication' => [
-                        'token',
-                        'user'
+                        'api' => 'token',
+                        'login' => 'user'
                     ],
                     'args' => [
 
@@ -303,12 +333,12 @@ class CustomerController extends Controller
                             'field' => 'validation message'
                         ],
                         'success' => [
-                            'first_name' => 'srting',
-                            'last_name' => 'srting',
+                            'first_name' => 'string',
+                            'last_name' => 'string',
                             'email' => 'string',
                             'address' => 'string',
                             'gender' => 'string',
-                            'phone_numbers' => 'string',
+                            'phone_numbers' => 'array[\'string\']',
                             'newsletter_preference' => 'string'
                         ]
                     ]
@@ -319,6 +349,10 @@ class CustomerController extends Controller
                     'path' => '/{email}',
                     'method' => 'DELETE',
                     'description' => 'Delete customer with specified email',
+                    'authentication' => [
+                        'api' => 'token',
+                        'login' => 'staff'
+                    ],
                     'args' =>[
                         'email' => [
                             'required' => true,
@@ -345,7 +379,7 @@ class CustomerController extends Controller
 
 
     /**
-     * Logs in a CUstomer
+     * Logs in a Customer
      * 
      * @param string $request->email
      * @param string $request->password
@@ -406,7 +440,7 @@ class CustomerController extends Controller
         }
 
         //IF LOGIN FAILS
-        if(!Auth::check()){
+        if(!Auth::guard('web')->check()){
 
             return response()->json( [
                 'error' => 'An error occured. Could not sign you in.'
@@ -433,8 +467,23 @@ class CustomerController extends Controller
     public function index()
     {
 
-        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
+        /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
+        //===============TO-DO: REMOVE THIS!!!!====================
+        //Login Simulation
+        $staff= Staff::all()->first();
+        Auth::guard('staffs')->login($staff);
+        //========================================================
 
+
+        
+        //If no staff is not authenticated
+        if(!Auth::guard('staffs')->check()){
+
+            return response()->json( [
+                'error' => 'Please login as a staff.'
+            ], 401);
+
+        }
         
         $customers= Customer::all();
 
@@ -453,6 +502,22 @@ class CustomerController extends Controller
     public function show($email)
     {
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
+        //===============TO-DO: REMOVE THIS!!!!====================
+        //Login Simulation
+        $staff= Staff::all()->first();
+        Auth::guard('staffs')->login($staff);
+        //========================================================
+
+
+        
+        //If no staff is not authenticated
+        if(!Auth::guard('staffs')->check()){
+
+            return response()->json( [
+                'error' => 'Please login as a staff.'
+            ], 401);
+
+        }
         
         $customer= Customer::find($email);
 
@@ -483,7 +548,7 @@ class CustomerController extends Controller
         //========================================================
         
         //If the current user is not authenticated
-        if(!Auth::check()){
+        if(!Auth::guard('web')->check()){
 
             return response()->json( [
                 'error' => 'Please login.'
@@ -518,6 +583,7 @@ class CustomerController extends Controller
         $rules= [
             'first_name' => 'required|max:50|string',
             'last_name' => 'required|max:50|string',
+            //====================== IMPLEMENT: VALIDATE EMAIL=========================
             'email' => 'required|max:100|string',
             'password' => 'required|max:250|string',
             'address' => 'required|string',
@@ -564,7 +630,7 @@ class CustomerController extends Controller
         //SUCCESS VALIDATION
 
         //create new Customer with provided data
-        $new_customer= new Customer;
+        $new_customer= new Customer();
 
         $new_customer->first_name= $request->first_name;
         $new_customer->last_name= $request->last_name;
@@ -594,7 +660,7 @@ class CustomerController extends Controller
 
 
     /**
-     * Edit an existing Customer
+     * Edit an existing Customer. Customer must logged in.
      * 
      * @param  string  $request->first_name
      * @param  string  $request->last_name
@@ -619,7 +685,7 @@ class CustomerController extends Controller
         //========================================================
 
         //If the current user is not authenticated
-        if(!Auth::check()){
+        if(!Auth::guard('web')->check()){
 
             return response()->json( [
                 'error' => 'Please login.'
@@ -635,7 +701,6 @@ class CustomerController extends Controller
         $rules= [
             'first_name' => 'max:50|string',
             'last_name' => 'max:50|string',
-            'email' => 'max:100|string',
             'password' => 'max:250|string',
             'new_password' => 'max:250|string',
             'address' => 'string',
@@ -717,7 +782,23 @@ class CustomerController extends Controller
      */
     public function delete($email){
 
-        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
+        /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
+        //===============TO-DO: REMOVE THIS!!!!====================
+        //Login Simulation
+        $staff= Staff::all()->first();
+        Auth::guard('staffs')->login($staff);
+        //========================================================
+
+        
+        //If no staff is not authenticated
+        if(!Auth::guard('staffs')->check()){
+
+            return response()->json( [
+                'error' => 'Please login as a staff.'
+            ], 401);
+
+        }
+
 
         //Check if Customer exisits
         $customer= Customer::find($email);

@@ -1155,7 +1155,18 @@ class ProductController extends Controller
             ], 404);
         }
 
-        //Delete product
+
+        //check for existing orders
+        $orders= Order::where('product_id', $product->id)->get();
+
+        if($orders->count() > 0){
+            return response()->json(
+                [
+                    'error' => 'Could not delete! Product has existing orders'
+                ], 401);
+        }
+
+        //Otherwise, delete product
         $product->delete();
 
         return response()->json([], 204);

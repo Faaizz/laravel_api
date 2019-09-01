@@ -9,14 +9,27 @@ class Staff extends Authenticatable
 {
     protected $table= 'staffs';
     protected $primaryKey= 'email';
-    protected $keyType= 'stirng';
+    protected $keyType= 'string';
 
     protected $hidden= [
         'remember_token'
     ];
 
+    public function isAdmin(){
+
+        if( $this->privilege_level == "admin"){
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }
+
     //Relationship with Orders
     public function orders(){
+
         return $this->hasMany('App\Order');
+        
     }
 }
