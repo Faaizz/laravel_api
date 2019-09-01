@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
+//RESOURCES
+use App\Http\Resources\Customer as CustomerResource;
+use App\Http\Resources\CustomerCollection;
+
 
 class CustomerController extends Controller
 {
@@ -59,23 +63,29 @@ class CustomerController extends Controller
                         'api' => 'token'
                     ],
                     'args' => [
-                        'email' => [
-                            'required' => true,
-                            'description' => 'customer email',
-                            'type' => 'string'
-                        ],
 
-                        'password' => [
-                            'required' => true,
-                            'description' => 'customer password',
-                            'type' => 'string'
-                        ],
+                        'POST' => [
 
-                        'remember' => [
-                            'required' => false,
-                            'description' => 'Set "yes" if user wna==ants to stay logged in',
-                            'type' => 'string'
+                            'email' => [
+                                'required' => true,
+                                'description' => 'customer email',
+                                'type' => 'string'
+                            ],
+
+                            'password' => [
+                                'required' => true,
+                                'description' => 'customer password',
+                                'type' => 'string'
+                            ],
+
+                            'remember' => [
+                                'required' => false,
+                                'description' => 'Set "yes" if user wna==ants to stay logged in',
+                                'type' => 'string'
+                            ]
+
                         ]
+
                     ],
                     'return_type' => 'json',
                     'return_structure' => [
@@ -102,11 +112,15 @@ class CustomerController extends Controller
 
                     ],
                     'args' => [
-                        'email' => [
-                            'required' => true,
-                            'description' => 'customer email',
-                            'type' => 'string'
+
+                        'GET' => [
+                            'page' => [
+                                'required' => false,
+                                'description' => 'customer email',
+                                'type' => 'string'
+                            ]
                         ]
+
                     ],
                     'return_type' => 'array: json',
                     'return_type' => [
@@ -114,18 +128,35 @@ class CustomerController extends Controller
                             'error' => 'error message'
                         ],
                         'success' => [
-                            'array of' => [
-                                'first_name' => 'string',
-                                'last_name' => 'string',
-                                'email' => 'string',
-                                'address' => 'string',
-                                'gender' => 'string',
-                                'phone_numbers' => 'array["string"]',
-                                'activation_status' => 'string',
-                                'newsletters' => 'string',
-                                'shopping_cart' => 'array["products"]',
-                                'liked_items' => 'array'
+                            'data' => [
+                                [
+                                    'first_name' => 'string',
+                                    'last_name' => 'string',
+                                    'email' => 'string',
+                                    'address' => 'string',
+                                    'gender' => 'string',
+                                    'phone_numbers' => 'array["string"]',
+                                    'activation_status' => 'string',
+                                    'newsletters' => 'string',
+                                    'pending_orders' => 'integer'
+                                ]
+                            ],
+                            "links" => [
+                                    "first" => "string",
+                                    "last" => "string",
+                                    "prev" => "string",
+                                    "next" => "string"
+                            ],
+                            "meta" => [
+                                    "current_page" => "integer",
+                                    "from" => "integer",
+                                    "last_page" => "integer",
+                                    "path" => "string",
+                                    "per_page" => "integer",
+                                    "to" => "integer",
+                                    "total" => "integer"
                             ]
+
                         ]
                     ]
                 ],
@@ -139,11 +170,17 @@ class CustomerController extends Controller
                         'login' => 'staff'
                     ],
                     'args' => [
-                        'email' => [
-                            'required' => true,
-                            'description' => 'customer email',
-                            'type' => 'string'
+
+                        'ROUTE' => [
+
+                            'email' => [
+                                'required' => true,
+                                'description' => 'customer email',
+                                'type' => 'string'
+                            ]
+
                         ]
+
                     ],
                     'return_type' => 'json',
                     'return_type' => [
@@ -151,16 +188,17 @@ class CustomerController extends Controller
                             'error' => 'error message'
                         ],
                         'success' => [
-                            'first_name' => 'string',
-                            'last_name' => 'string',
-                            'email' => 'string',
-                            'address' => 'string',
-                            'gender' => 'string',
-                            'phone_numbers' => 'array["string"]',
-                            'activation_status' => 'string',
-                            'newsletters' => 'string',
-                            'shopping_cart' => 'array["products"]',
-                            'liked_items' => 'array'
+                            'data' => [
+                                'first_name' => 'string',
+                                'last_name' => 'string',
+                                'email' => 'string',
+                                'address' => 'string',
+                                'gender' => 'string',
+                                'phone_numbers' => 'array["string"]',
+                                'activation_status' => 'string',
+                                'newsletters' => 'string',
+                                'pending_orders' => 'integer'
+                            ]
                         ]
                     ]
                 ],
@@ -182,16 +220,17 @@ class CustomerController extends Controller
                             'error' => 'error message'
                         ],
                         'success' => [
-                            'first_name' => 'string',
-                            'last_name' => 'string',
-                            'email' => 'string',
-                            'address' => 'string',
-                            'gender' => 'string',
-                            'phone_numbers' => 'array["string"]',
-                            'activation_status' => 'string',
-                            'newsletters' => 'string',
-                            'shopping_cart' => 'array["products"]',
-                            'liked_items' => 'array'
+                            'data' => [
+                                'first_name' => 'string',
+                                'last_name' => 'string',
+                                'email' => 'string',
+                                'address' => 'string',
+                                'gender' => 'string',
+                                'phone_numbers' => 'array["string"]',
+                                'activation_status' => 'string',
+                                'newsletters' => 'string',
+                                'pending_orders' => 'integer'
+                            ]
                         ]
                     ]
                 ],
@@ -206,47 +245,52 @@ class CustomerController extends Controller
                     ],
                     'args' => [
 
-                        'first_name' => [
-                            'required' => true,
-                            'description' => 'First name',
-                            'type' => 'string'
-                        ],
+                        'POST' => [
 
-                        'last_name' => [
-                            'required' => true,
-                            'description' => 'Last name',
-                            'type' => 'string'
-                        ],
+                            'first_name' => [
+                                'required' => true,
+                                'description' => 'First name',
+                                'type' => 'string'
+                            ],
 
-                        'email' => [
-                            'required' => true,
-                            'description' => 'Email address (must be unique for all customers)',
-                            'type' => 'string'
-                        ],
+                            'last_name' => [
+                                'required' => true,
+                                'description' => 'Last name',
+                                'type' => 'string'
+                            ],
 
-                        'password' => [
-                            'required' => true,
-                            'description' => 'Password',
-                            'type' => 'SHA256 hashed string'
-                        ],
+                            'email' => [
+                                'required' => true,
+                                'description' => 'Email address (must be unique for all customers)',
+                                'type' => 'string'
+                            ],
 
-                        'address' => [
-                            'required' => true,
-                            'description' => 'Address',
-                            'type' => 'string'
-                        ],
+                            'password' => [
+                                'required' => true,
+                                'description' => 'Password',
+                                'type' => 'SHA256 hashed string'
+                            ],
 
-                        'gender' => [
-                            'required' => true,
-                            'description' => 'Gender. "male" OR "female"',
-                            'type' => 'string'
-                        ],
+                            'address' => [
+                                'required' => true,
+                                'description' => 'Address',
+                                'type' => 'string'
+                            ],
 
-                        'phone_numbers' => [
-                            'required' => true,
-                            'description' => 'Phone numbers',
-                            'type' => 'array["string"]'
+                            'gender' => [
+                                'required' => true,
+                                'description' => 'Gender. "male" OR "female"',
+                                'type' => 'string'
+                            ],
+
+                            'phone_numbers' => [
+                                'required' => true,
+                                'description' => 'Phone numbers',
+                                'type' => 'array["string"]'
+                            ]
+
                         ]
+
                     ],
                     'return_type' => 'json',                    
                     'return_data_structure' => [
@@ -254,13 +298,16 @@ class CustomerController extends Controller
                             'request field' => 'validation message'
                         ],
                         'success' => [
-                            'first_name' => 'srting',
-                            'last_name' => 'srting',
-                            'email' => 'string',
-                            'address' => 'string',
-                            'gender' => 'string',
-                            'phone_numbers' => 'string',
-                            'activation_status' => 'string'
+                            'data' => [
+                                'first_name' => 'srting',
+                                'last_name' => 'srting',
+                                'email' => 'string',
+                                'address' => 'string',
+                                'gender' => 'string',
+                                'phone_numbers' => 'string',
+                                'activation_status' => 'string',
+                                'pending_orders' => 'integer'
+                            ]
                         ]
                     ]
                 ],
@@ -276,53 +323,58 @@ class CustomerController extends Controller
                     ],
                     'args' => [
 
-                        'first_name' => [
-                            'required' => false,
-                            'description' => 'First name',
-                            'type' => 'string'
-                        ],
+                        'POST' => [
 
-                        'last_name' => [
-                            'required' => false,
-                            'description' => 'Last name',
-                            'type' => 'string'
-                        ],
+                            'first_name' => [
+                                'required' => false,
+                                'description' => 'First name',
+                                'type' => 'string'
+                            ],
 
-                        'password' => [
-                            'required' => false,
-                            'description' => 'Current Password',
-                            'type' => 'SHA2 hashed string'
-                        ],
+                            'last_name' => [
+                                'required' => false,
+                                'description' => 'Last name',
+                                'type' => 'string'
+                            ],
 
-                        'new_password' => [
-                            'required' => false,
-                            'description' => 'New Password',
-                            'type' => 'SHA2 hashed string'
-                        ],
+                            'password' => [
+                                'required' => false,
+                                'description' => 'Current Password',
+                                'type' => 'SHA2 hashed string'
+                            ],
 
-                        'address' => [
-                            'required' => false,
-                            'description' => 'Address',
-                            'type' => 'string'
-                        ],
+                            'new_password' => [
+                                'required' => false,
+                                'description' => 'New Password',
+                                'type' => 'SHA2 hashed string'
+                            ],
 
-                        'gender' => [
-                            'required' => false,
-                            'description' => 'Gender. "male" OR "female"',
-                            'type' => 'string'
-                        ],
+                            'address' => [
+                                'required' => false,
+                                'description' => 'Address',
+                                'type' => 'string'
+                            ],
 
-                        'phone_numbers' => [
-                            'required' => false,
-                            'description' => 'Phone numbers',
-                            'type' => 'array["string"]'
-                        ],
+                            'gender' => [
+                                'required' => false,
+                                'description' => 'Gender. "male" OR "female"',
+                                'type' => 'string'
+                            ],
 
-                        'newsletters' => [
-                            'required' => false,
-                            'description' => 'Newslettter preference ("Yes" or "No")',
-                            'type' => 'string'
+                            'phone_numbers' => [
+                                'required' => false,
+                                'description' => 'Phone numbers',
+                                'type' => 'array["string"]'
+                            ],
+
+                            'newsletters' => [
+                                'required' => false,
+                                'description' => 'Newslettter preference ("Yes" or "No")',
+                                'type' => 'string'
+                            ]
+
                         ]
+
                     ],
                     'return_type' => 'json',                    
                     'return_data_structure' => [
@@ -333,13 +385,15 @@ class CustomerController extends Controller
                             'field' => 'validation message'
                         ],
                         'success' => [
-                            'first_name' => 'string',
-                            'last_name' => 'string',
-                            'email' => 'string',
-                            'address' => 'string',
-                            'gender' => 'string',
-                            'phone_numbers' => 'array[\'string\']',
-                            'newsletter_preference' => 'string'
+                            'data' => [
+                                'first_name' => 'string',
+                                'last_name' => 'string',
+                                'email' => 'string',
+                                'address' => 'string',
+                                'gender' => 'string',
+                                'phone_numbers' => 'array[\'string\']',
+                                'newsletter_preference' => 'string'
+                            ]
                         ]
                     ]
                 ],
@@ -354,10 +408,14 @@ class CustomerController extends Controller
                         'login' => 'staff'
                     ],
                     'args' =>[
-                        'email' => [
-                            'required' => true,
-                            'description' => 'email of customer to delete',
-                            'type' => 'string'
+                        'ROUTE' => [
+
+                            'email' => [
+                                'required' => true,
+                                'description' => 'customer email',
+                                'type' => 'string'
+                            ]
+
                         ]
                     ],
                     'return_type' => null,
@@ -470,8 +528,7 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $staff= Staff::all()->first();
-        Auth::guard('staffs')->login($staff);
+        $this->simulateStaffLogin();
         //========================================================
 
 
@@ -484,10 +541,9 @@ class CustomerController extends Controller
             ], 401);
 
         }
-        
-        $customers= Customer::all();
 
-        return response()->json($customers, 200);
+        //Return all Customers through the Customer Resource and paginate
+        return new CustomerCollection(Customer::paginate(20));
 
     }
 
@@ -504,8 +560,7 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $staff= Staff::all()->first();
-        Auth::guard('staffs')->login($staff);
+        $this->simulateStaffLogin();
         //========================================================
 
 
@@ -529,7 +584,7 @@ class CustomerController extends Controller
         }
 
         //otherwise return customer data
-        return response()->json($customer, 200);
+        return new CustomerResource($customer);
 
     }
 
@@ -543,8 +598,7 @@ class CustomerController extends Controller
         
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $customer= Customer::all()->first();
-        Auth::guard('web')->login($customer);
+        $this->simulateCustomerLogin();
         //========================================================
         
         //If the current user is not authenticated
@@ -583,7 +637,6 @@ class CustomerController extends Controller
         $rules= [
             'first_name' => 'required|max:50|string',
             'last_name' => 'required|max:50|string',
-            //====================== IMPLEMENT: VALIDATE EMAIL=========================
             'email' => 'required|max:100|string',
             'password' => 'required|max:250|string',
             'address' => 'required|string',
@@ -593,10 +646,20 @@ class CustomerController extends Controller
 
         $request_validator= Validator::make($request->all(), $rules);
 
-        //if validation fails
+        //if Laravel request validation fails
         if($request_validator->fails()){
             //return a json array of errors
             return response()->json( $request_validator->errors(), 401);
+        }
+
+
+        //validate email
+        if( !filter_var($request->email, FILTER_VALIDATE_EMAIL) ) {
+            
+            return response()->json( [
+                'error' => 'Please enter a valid email.'
+            ] ,401);
+
         }
 
         //validate gender
@@ -655,7 +718,7 @@ class CustomerController extends Controller
         }
 
         //return the newly created Customer
-        return response()->json($new_customer_saved, 200);
+        return new CustomerResource($new_customer_saved);
     }
 
 
@@ -680,8 +743,7 @@ class CustomerController extends Controller
 
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $customer= Customer::find("alfredo.hyatt@example.net");
-        Auth::guard('web')->login($customer);
+        $this->simulateCustomerLogin();
         //========================================================
 
         //If the current user is not authenticated
@@ -692,6 +754,7 @@ class CustomerController extends Controller
             ], 401);
 
         }
+
 
 
         //SUCCESS AUTHENTICATION
@@ -710,7 +773,7 @@ class CustomerController extends Controller
 
         $request_validator= Validator::make($request->all(), $rules);
 
-        //FAILED VALIDATION
+        //FAILED LARAVEL REQUEST VALIDATION
         if($request_validator->fails()){
 
             return response()->json( $request_validator->errors(), 401);
@@ -718,7 +781,11 @@ class CustomerController extends Controller
         }
 
 
+
         //SUCCESS VALIDATION
+
+        //Pull current customer from database
+        $customer= Auth::guard('web')->user();
 
         //Put the request data into a Laravel Colection
         $request_collection= collect($request);
@@ -765,10 +832,7 @@ class CustomerController extends Controller
             ] ,500);
         }
 
-        return response()->json( [
-            'message' => 'Details successsfully updated.',
-            'details' => $customer
-        ] ,200);
+        return new CustomerResource($customer);
 
     }
 
@@ -785,8 +849,7 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $staff= Staff::all()->first();
-        Auth::guard('staffs')->login($staff);
+        $this->simulateStaffLogin();
         //========================================================
 
         
@@ -827,6 +890,34 @@ class CustomerController extends Controller
         $customer->delete();
 
         return response()->json( [],204);
+    }
+
+
+
+    /* ============================================================ */
+    /*  U   T   I   L   I   T   Y       F   U   N   C   T   I   O   N   S */
+
+
+    /**
+     * Simulate Customer Login
+     */
+    protected function simulateCustomerLogin(){
+
+        //Login the last customer
+        $customer= customer::all()->last();
+        Auth::guard('web')->login($customer);
+
+    }
+
+    /**
+     * Simulate Staff Login
+     */
+    protected function simulateStaffLogin(){
+
+        //Login the last Staff
+        $staff= Staff::all()->last();
+        Auth::guard('staffs')->login($staff);
+
     }
 
 }

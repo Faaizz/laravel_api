@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Product;
 
+use App\Product;
 use App\Order;
 
+
 use Illuminate\Support\Carbon;
-
 use Illuminate\Support\Facades\Validator;
-
 use Illuminate\Support\Facades\Storage;
+
+
+use App\Http\Resources\ProductCollection;
+use App\Http\Resources\Product as ProductResource;
+
+
 
 class ProductController extends Controller
 {
@@ -59,42 +64,75 @@ class ProductController extends Controller
                     'authentication' => [],
                     'args' => [
 
-                        'section' => [
-                            'required' => false,
-                            'description' => 'Product section',
-                            'type' => 'string'
+                        'GET' => [
+                            'page' => [
+                                'required' => false,
+                                'description' => 'current page',
+                                'type' => 'integer'
+                            ],
+                            'per_page' => [
+                                'required' => false,
+                                'description' => 'number of products to display per page',
+                                'type' => 'integer'
+                            ]
                         ],
 
-                        'sub_section' => [
-                            'required' => false,
-                            'description' => 'Product sub section',
-                            'type' => 'string'
-                        ],
+                        'ROUTE' => [
+                            'section' => [
+                                'required' => false,
+                                'description' => 'Product section',
+                                'type' => 'string'
+                            ],
 
-                        'category' => [
-                            'required' => false,
-                            'description' => 'Product sub section',
-                            'type' => 'string'
+                            'sub_section' => [
+                                'required' => false,
+                                'description' => 'Product sub section',
+                                'type' => 'string'
+                            ],
+
+                            'category' => [
+                                'required' => false,
+                                'description' => 'Product sub section',
+                                'type' => 'string'
+                            ]
                         ]
+
                     ],
                     'return_type' => 'array: json',
                     'return_data_structure' => [
-                        [
-                            'id' => 'integer',
-                            'name' => 'srting',
-                            'brand' => 'string',
-                            'description' => 'string',
-                            'section' => 'string',
-                            'sub_section' => 'string',
-                            'category' => 'string',
-                            'price' => 'double',
-                            'color' => 'string',
-                            'material' => 'string',
-                            'images' => 'array["string"]',
-                            'options' => 'array',
-                            'created_at' => 'string',
-                            'updated_at' => 'string'
+                        'data' => [
+                            [
+                                'id' => 'integer',
+                                'name' => 'srting',
+                                'brand' => 'string',
+                                'description' => 'string',
+                                'section' => 'string',
+                                'sub_section' => 'string',
+                                'category' => 'string',
+                                'price' => 'double',
+                                'color' => 'string',
+                                'material' => 'string',
+                                'images' => 'array["string"]',
+                                'options' => 'array',
+                                'created_at' => 'string',
+                                'updated_at' => 'string'
 
+                            ]
+                        ],
+                        "links" => [
+                                "first" => "string",
+                                "last" => "string",
+                                "prev" => "string",
+                                "next" => "string"
+                        ],
+                        "meta" => [
+                                "current_page" => "integer",
+                                "from" => "integer",
+                                "last_page" => "integer",
+                                "path" => "string",
+                                "per_page" => "integer",
+                                "to" => "integer",
+                                "total" => "integer"
                         ]
                     ]
                 ],
@@ -106,31 +144,45 @@ class ProductController extends Controller
                     'authentication' => [],
                     'args' => [
 
-                        'weeks' => [
-                            'required' => false,
-                            'description' => 'number of weeks to go back from the current date',
-                            'type' => 'integer'
+                        'GET' => [
+                            'page' => [
+                                'required' => false,
+                                'description' => 'current page',
+                                'type' => 'integer'
+                            ]
                         ],
 
-                        'section' => [
-                            'required' => false,
-                            'description' => 'Product section',
-                            'type' => 'string'
-                        ],
+                        'ROUTE' => [
 
-                        'sub_section' => [
-                            'required' => false,
-                            'description' => 'Product sub section',
-                            'type' => 'string'
-                        ],
+                            'weeks' => [
+                                'required' => false,
+                                'description' => 'number of weeks to go back from the current date',
+                                'type' => 'integer'
+                            ],
 
-                        'category' => [
-                            'required' => false,
-                            'description' => 'Product sub section',
-                            'type' => 'string'
-                        ],
-                        'return_type' => 'array: json',                        
-                        'return_data_structure' => [
+                            'section' => [
+                                'required' => false,
+                                'description' => 'Product section',
+                                'type' => 'string'
+                            ],
+
+                            'sub_section' => [
+                                'required' => false,
+                                'description' => 'Product sub section',
+                                'type' => 'string'
+                            ],
+
+                            'category' => [
+                                'required' => false,
+                                'description' => 'Product sub section',
+                                'type' => 'string'
+                            ]
+                        ]
+
+                    ],
+                    'return_type' => 'array: json',                        
+                    'return_data_structure' => [
+                        'data' => [
                             [
                                 'id' => 'integer',
                                 'name' => 'srting',
@@ -146,8 +198,23 @@ class ProductController extends Controller
                                 'options' => 'array',
                                 'created_at' => 'string',
                                 'updated_at' => 'string'
-    
+
                             ]
+                        ],
+                        "links" => [
+                                "first" => "string",
+                                "last" => "string",
+                                "prev" => "string",
+                                "next" => "string"
+                        ],
+                        "meta" => [
+                                "current_page" => "integer",
+                                "from" => "integer",
+                                "last_page" => "integer",
+                                "path" => "string",
+                                "per_page" => "integer",
+                                "to" => "integer",
+                                "total" => "integer"
                         ]
                     ]
                 ],
@@ -158,30 +225,35 @@ class ProductController extends Controller
                     'description' => 'returns product with the specified id',
                     'authentication' => [],
                     'args' => [
-                        'id' => [
-                            'required' => true,
-                            'description' => 'product id',
-                            'type' => 'integer'
+
+                        'ROUTE' => [
+                            'id' => [
+                                'required' => true,
+                                'description' => 'product id',
+                                'type' => 'integer'
+                            ]
                         ]
+
                     ],
                     'return_type' => 'json',                    
                     'return_data_structure' => [
-                        
-                        'id' => 'integer',
-                        'name' => 'srting',
-                        'brand' => 'string',
-                        'description' => 'string',
-                        'section' => 'string',
-                        'sub_section' => 'string',
-                        'category' => 'string',
-                        'price' => 'double',
-                        'color' => 'string',
-                        'material' => 'string',
-                        'images' => 'array',
-                        'options' => 'array',
-                        'created_at' => 'string',
-                        'updated_at' => 'string'
 
+                        'data' => [                        
+                            'id' => 'integer',
+                            'name' => 'string',
+                            'brand' => 'string',
+                            'description' => 'string',
+                            'section' => 'string',
+                            'sub_section' => 'string',
+                            'category' => 'string',
+                            'price' => 'double',
+                            'color' => 'string',
+                            'material' => 'string',
+                            'images' => 'array',
+                            'options' => 'array',
+                            'created_at' => 'string',
+                            'updated_at' => 'string'
+                        ]
                         
                     ]
                 ],
@@ -193,63 +265,224 @@ class ProductController extends Controller
                     'authentication' => [],
                     'args' => [
 
-                        'section' => [
-                            'required' => true,
-                            'description' => 'Product section',
-                            'type' => 'string'
+                        'GET' => [
+                            'page' => [
+                                'required' => false,
+                                'description' => 'current page',
+                                'type' => 'integer'
+                            ]
                         ],
 
-                        'sub_section' => [
-                            'required' => true,
-                            'description' => 'Product sub section',
-                            'type' => 'string'
-                        ],
+                        'POST' => [
 
-                        'category' => [
-                            'required' => true,
-                            'description' => 'Product sub section',
-                            'type' => 'string'
-                        ],
+                            'section' => [
+                                'required' => true,
+                                'description' => 'Product section',
+                                'type' => 'string'
+                            ],
 
-                        'color' => [
-                            'required' => false,
-                            'description' => 'Product color',
-                            'type' => 'string'
-                        ],
+                            'sub_section' => [
+                                'required' => true,
+                                'description' => 'Product sub section',
+                                'type' => 'string'
+                            ],
 
-                        'material' => [
-                            'required' => false,
-                            'description' => 'Product material',
-                            'type' => 'string'
-                        ],
+                            'category' => [
+                                'required' => true,
+                                'description' => 'Product sub section',
+                                'type' => 'string'
+                            ],
 
-                        'min_price' => [
-                            'required' => false,
-                            'description' => 'Higher price limit',
-                            'type' => 'double'
-                        ],
+                            'color' => [
+                                'required' => false,
+                                'description' => 'Product color',
+                                'type' => 'string'
+                            ],
 
-                        'max_price' => [
-                            'required' => false,
-                            'description' => 'Lower price limit',
-                            'type' => 'double'
-                        ],
+                            'material' => [
+                                'required' => false,
+                                'description' => 'Product material',
+                                'type' => 'string'
+                            ],
 
-                        'brand' => [
-                            'required' => false,
-                            'description' => 'Product brand',
-                            'type' => 'string'
-                        ],
+                            'min_price' => [
+                                'required' => false,
+                                'description' => 'Higher price limit',
+                                'type' => 'double'
+                            ],
 
-                        'name' => [
-                            'required' => false,
-                            'description' => 'Product name',
-                            'type' => 'string'
+                            'max_price' => [
+                                'required' => false,
+                                'description' => 'Lower price limit',
+                                'type' => 'double'
+                            ],
+
+                            'brand' => [
+                                'required' => false,
+                                'description' => 'Product brand',
+                                'type' => 'string'
+                            ],
+
+                            'name' => [
+                                'required' => false,
+                                'description' => 'Product name',
+                                'type' => 'string'
+                            ]
+                            
                         ]
+
                     ],
                     'return_type' => 'array: json',                    
                     'return_data_structure' => [
-                        [
+
+                        'data' => [
+                            [
+                                'id' => 'integer',
+                                'name' => 'srting',
+                                'brand' => 'string',
+                                'description' => 'string',
+                                'section' => 'string',
+                                'sub_section' => 'string',
+                                'category' => 'string',
+                                'price' => 'double',
+                                'color' => 'string',
+                                'material' => 'string',
+                                'images' => 'array',
+                                'options' => 'array',
+                                'created_at' => 'string',
+                                'updated_at' => 'string'
+
+                            ]
+                        ],
+                        "links" => [
+                                "first" => "string",
+                                "last" => "string",
+                                "prev" => "string",
+                                "next" => "string"
+                        ],
+                        "meta" => [
+                                "current_page" => "integer",
+                                "from" => "integer",
+                                "last_page" => "integer",
+                                "path" => "string",
+                                "per_page" => "integer",
+                                "to" => "integer",
+                                "total" => "integer"
+                        ]
+                    ]
+                ],
+
+
+                //CREATE
+
+                [
+                    'path' => '/',
+                    'method' => 'POST',
+                    'description' => 'Add Product to database and returns details of the newly added product',
+                    'authentication' => [
+                        'api' => 'token',
+                        'login' => 'admin'
+                    ],
+                    'args' => [
+
+                        'GET' => [
+                            'page' => [
+                                'required' => false,
+                                'description' => 'current page',
+                                'type' => 'integer'
+                            ]
+                        ],
+
+                        'POST' => [
+
+                            'name' => [
+                                'required' => true,
+                                'description' => 'Product name',
+                                'type' => 'string'
+                            ],
+
+                            'brand' => [
+                                'required' => true,
+                                'description' => 'Product brand',
+                                'type' => 'string'
+                            ],
+
+                            'description' => [
+                                'required' => true,
+                                'description' => 'Product description',
+                                'type' => 'string'
+                            ],
+
+                            'section' => [
+                                'required' => true,
+                                'description' => 'Product section',
+                                'type' => 'string'
+                            ],
+
+                            'sub_section' => [
+                                'required' => true,
+                                'description' => 'Product sub section',
+                                'type' => 'string'
+                            ],
+
+                            'category' => [
+                                'required' => true,
+                                'description' => 'Product sub section',
+                                'type' => 'string'
+                            ],
+
+                            'color' => [
+                                'required' => true,
+                                'description' => 'Product color',
+                                'type' => 'string'
+                            ],
+
+                            'price' => [
+                                'required' => true,
+                                'description' => 'Product price',
+                                'type' => 'double'
+                            ],
+
+                            'material' => [
+                                'required' => true,
+                                'description' => 'Product material',
+                                'type' => 'string'
+                            ],
+
+                            'size_and_quantity' => [
+                                'required' => true,
+                                'description' => 'Array of product sizes and corresponding qunatity of each',
+                                'type' => 'array: array[
+                                    "size" => string,
+                                    "quantity" => integer
+                                    ]'
+                            ],
+
+                            'image_one' => [
+                                'required' => true,
+                                'description' => 'Product image one',
+                                'type' => '.png | .jpg | .gif'
+                            ],
+
+                            'image_two' => [
+                                'required' => true,
+                                'description' => 'Product image two',
+                                'type' => '.png | .jpg | .gif'
+                            ],
+
+                            'image_three' => [
+                                'required' => true,
+                                'description' => 'Product image three',
+                                'type' => '.png | .jpg | .gif'
+                            ]
+
+                        ]
+                    ],
+                    'return_type' => 'json',                    
+                    'return_data_structure' => [
+
+                        'message' => 'create message',
+                        'data' => [
                             'id' => 'integer',
                             'name' => 'srting',
                             'brand' => 'string',
@@ -264,120 +497,8 @@ class ProductController extends Controller
                             'options' => 'array',
                             'created_at' => 'string',
                             'updated_at' => 'string'
-
                         ]
-                    ]
-                ],
 
-
-                //CREATE
-
-                [
-                    'path' => '/',
-                    'method' => 'POST',
-                    'description' => 'Add Product to database and returns details of the newly added product',
-                    'authentication' => [
-                        'token'
-                    ],
-                    'args' => [
-
-                        'name' => [
-                            'required' => true,
-                            'description' => 'Product name',
-                            'type' => 'string'
-                        ],
-
-                        'brand' => [
-                            'required' => true,
-                            'description' => 'Product brand',
-                            'type' => 'string'
-                        ],
-
-                        'description' => [
-                            'required' => true,
-                            'description' => 'Product description',
-                            'type' => 'string'
-                        ],
-
-                        'section' => [
-                            'required' => true,
-                            'description' => 'Product section',
-                            'type' => 'string'
-                        ],
-
-                        'sub_section' => [
-                            'required' => true,
-                            'description' => 'Product sub section',
-                            'type' => 'string'
-                        ],
-
-                        'category' => [
-                            'required' => true,
-                            'description' => 'Product sub section',
-                            'type' => 'string'
-                        ],
-
-                        'color' => [
-                            'required' => true,
-                            'description' => 'Product color',
-                            'type' => 'string'
-                        ],
-
-                        'price' => [
-                            'required' => true,
-                            'description' => 'Product price',
-                            'type' => 'double'
-                        ],
-
-                        'material' => [
-                            'required' => true,
-                            'description' => 'Product material',
-                            'type' => 'string'
-                        ],
-
-                        'size_and_quantity' => [
-                            'required' => true,
-                            'description' => 'Array of product sizes and corresponding qunatity of each',
-                            'type' => 'array: array[
-                                "size" => string,
-                                "quantity" => integer
-                                ]'
-                        ],
-
-                        'image_one' => [
-                            'required' => true,
-                            'description' => 'Product image one',
-                            'type' => '.png | .jpg | .gif'
-                        ],
-
-                        'image_two' => [
-                            'required' => true,
-                            'description' => 'Product image two',
-                            'type' => '.png | .jpg | .gif'
-                        ],
-
-                        'image_three' => [
-                            'required' => true,
-                            'description' => 'Product image three',
-                            'type' => '.png | .jpg | .gif'
-                        ],
-                    ],
-                    'return_type' => 'json',                    
-                    'return_data_structure' => [
-                        'id' => 'integer',
-                        'name' => 'srting',
-                        'brand' => 'string',
-                        'description' => 'string',
-                        'section' => 'string',
-                        'sub_section' => 'string',
-                        'category' => 'string',
-                        'price' => 'double',
-                        'color' => 'string',
-                        'material' => 'string',
-                        'images' => 'array',
-                        'options' => 'array',
-                        'created_at' => 'string',
-                        'updated_at' => 'string'
                     ]
                 ],
 
@@ -389,113 +510,127 @@ class ProductController extends Controller
                     'method' => 'PUT. NOTE: You have to use POST and then include a "_method: PUT" header',
                     'description' => 'Edit Product and return updated details of the edited product',
                     'authentication' => [
-                        'token'
+                        'api' => 'token',
+                        'login' => 'admin'
                     ],
                     'args' => [
 
-                        'id' => [
-                            'required' => true,
-                            'description' => 'id of product to edit',
-                            'type' => 'integer'
+                        'ROUTE' => [
+
+                            'id' => [
+                                'required' => true,
+                                'description' => 'id of product to edit',
+                                'type' => 'integer'
+                            ]
+
                         ],
 
-                        'name' => [
-                            'required' => true,
-                            'description' => 'Product name',
-                            'type' => 'string'
-                        ],
+                        'POST' => [
 
-                        'brand' => [
-                            'required' => true,
-                            'description' => 'Product brand',
-                            'type' => 'string'
-                        ],
+                            'name' => [
+                                'required' => true,
+                                'description' => 'Product name',
+                                'type' => 'string'
+                            ],
 
-                        'description' => [
-                            'required' => true,
-                            'description' => 'Product description',
-                            'type' => 'string'
-                        ],
+                            'brand' => [
+                                'required' => true,
+                                'description' => 'Product brand',
+                                'type' => 'string'
+                            ],
 
-                        'section' => [
-                            'required' => true,
-                            'description' => 'Product section',
-                            'type' => 'string'
-                        ],
+                            'description' => [
+                                'required' => true,
+                                'description' => 'Product description',
+                                'type' => 'string'
+                            ],
 
-                        'sub_section' => [
-                            'required' => true,
-                            'description' => 'Product sub section',
-                            'type' => 'string'
-                        ],
+                            'section' => [
+                                'required' => true,
+                                'description' => 'Product section',
+                                'type' => 'string'
+                            ],
 
-                        'category' => [
-                            'required' => true,
-                            'description' => 'Product sub section',
-                            'type' => 'string'
-                        ],
+                            'sub_section' => [
+                                'required' => true,
+                                'description' => 'Product sub section',
+                                'type' => 'string'
+                            ],
 
-                        'color' => [
-                            'required' => true,
-                            'description' => 'Product color',
-                            'type' => 'string'
-                        ],
+                            'category' => [
+                                'required' => true,
+                                'description' => 'Product sub section',
+                                'type' => 'string'
+                            ],
 
-                        'price' => [
-                            'required' => true,
-                            'description' => 'Product price',
-                            'type' => 'double'
-                        ],
+                            'color' => [
+                                'required' => true,
+                                'description' => 'Product color',
+                                'type' => 'string'
+                            ],
 
-                        'material' => [
-                            'required' => true,
-                            'description' => 'Product material',
-                            'type' => 'string'
-                        ],
+                            'price' => [
+                                'required' => true,
+                                'description' => 'Product price',
+                                'type' => 'double'
+                            ],
 
-                        'size_and_quantity' => [
-                            'required' => true,
-                            'description' => 'Array of product sizes and corresponding qunatity of each',
-                            'type' => 'array: array[
-                                "size" => string,
-                                "quantity" => integer
-                                ]'
-                        ],
-                        
-                        'image_one' => [
-                            'required' => true,
-                            'description' => 'Product image one',
-                            'type' => '.png | .jpg | .gif'
-                        ],
+                            'material' => [
+                                'required' => true,
+                                'description' => 'Product material',
+                                'type' => 'string'
+                            ],
 
-                        'image_two' => [
-                            'required' => true,
-                            'description' => 'Product image two',
-                            'type' => '.png | .jpg | .gif'
-                        ],
+                            'size_and_quantity' => [
+                                'required' => true,
+                                'description' => 'Array of product sizes and corresponding qunatity of each',
+                                'type' => 'array: array[
+                                    "size" => string,
+                                    "quantity" => integer
+                                    ]'
+                            ],
+                            
+                            'image_one' => [
+                                'required' => true,
+                                'description' => 'Product image one',
+                                'type' => '.png | .jpg | .gif'
+                            ],
 
-                        'image_three' => [
-                            'required' => true,
-                            'description' => 'Product image three',
-                            'type' => '.png | .jpg | .gif'
-                        ],
+                            'image_two' => [
+                                'required' => true,
+                                'description' => 'Product image two',
+                                'type' => '.png | .jpg | .gif'
+                            ],
+
+                            'image_three' => [
+                                'required' => true,
+                                'description' => 'Product image three',
+                                'type' => '.png | .jpg | .gif'
+                            ]
+
+                        ]
                     ],
                     'return_type' => 'json',                    
                     'return_data_structure' => [
-                        'id' => 'integer',
-                        'name' => 'srting',
-                        'brand' => 'string',
-                        'description' => 'string',
-                        'section' => 'string',
-                        'sub_section' => 'string',
-                        'category' => 'string',
-                        'price' => 'double',
-                        'color' => 'string',
-                        'material' => 'string',
-                        'images' => 'array',
-                        'options' => 'array',
-                        'created_at' => 'string',
-                        'updated_at' => 'string'                       
+
+                        'message' => 'update message',
+                        'data' => [
+                            'id' => 'integer',
+                            'name' => 'srting',
+                            'brand' => 'string',
+                            'description' => 'string',
+                            'section' => 'string',
+                            'sub_section' => 'string',
+                            'category' => 'string',
+                            'price' => 'double',
+                            'color' => 'string',
+                            'material' => 'string',
+                            'images' => 'array',
+                            'options' => 'array',
+                            'created_at' => 'string',
+                            'updated_at' => 'string'     
+                        ]
+
                     ]
                 ],
 
@@ -507,18 +642,23 @@ class ProductController extends Controller
                     'method' => 'DELETE',
                     'description' => 'delete product with specified id',
                     'authentication' => [
-                        'token'
+                        'api' => 'token',
+                        'login' => 'admin'
                     ],
                     'args' => [
-                        'id' => [
-                            'required' => true,
-                            'description' => 'Product id',
-                            'type' => 'integer'
+
+                        'ROUTE' => [
+
+                            'id' => [
+                                'required' => true,
+                                'description' => 'Product id',
+                                'type' => 'integer'
+                            ]
+
                         ]
                     ],
                     'return_type' => 'json',
                     'return_data_structure' => null
-
                 ],
 
                 [
@@ -529,16 +669,21 @@ class ProductController extends Controller
                         'token'
                     ],
                     'args' => [
-                        'ids' => [
-                            'required' => true,
-                            'description' => 'ids of products to delete',
-                            'type' => 'arrray: string'
+
+                        'POST' => [
+
+                            'ids' => [
+                                'required' => true,
+                                'description' => 'ids of products to delete',
+                                'type' => 'arrray: string'
+                            ]
+
                         ]
-                        ],
-                        'return_type' => 'json',
-                        'return_data_structure' => [
-                            'message' => 'string'
-                        ]
+                    ],
+                    'return_type' => 'json',
+                    'return_data_structure' => [
+                        'message' => 'string'
+                    ]
                 ]
 
 
@@ -557,10 +702,21 @@ class ProductController extends Controller
      * @param string $section Section string
      * @param string $sub_section Sub section string
      * @param string $category Category string
+     * @param string $request_>per_page Number of products to diaplsy per page
+     * 
      * 
      * @return JSON JSON formatted response
      */
-    public function index($section=null, $sub_section=null, $category=null){
+    public function index(Request $request, $section=null, $sub_section=null, $category=null){
+
+
+        //Set default per_page value for pagination
+        $per_page= 20;
+
+        //if a per_page parameter is included with the request, set it
+        if($request->per_page){
+            $per_page= \intval($request->per_page);
+        }
 
         $products= null;
 
@@ -573,27 +729,27 @@ class ProductController extends Controller
                     $products= Product::where( 'section', $section)
                                             ->where('sub_section', $sub_section)
                                             ->where('category', $category)
-                                            ->get();
+                                            ->paginate($per_page);
                           
                 }
                 else{
                     $products= Product::where( 'section', $section)
                                             ->where('sub_section', $sub_section)
-                                            ->get();
+                                            ->paginate($per_page);
                 }
 
             }
             else{
-                $products= Product::where( 'section', $section)->get();
+                $products= Product::where( 'section', $section)->paginate($per_page);
             }
 
         }
         else{
-            $products= Product::all();
+            $products= Product::paginate($per_page);
         }
 
 
-        return response()->json($products, 200);
+        return new ProductCollection($products);
 
     }
 
@@ -604,12 +760,21 @@ class ProductController extends Controller
      * @param string $section Section string
      * @param string $sub_section Sub section string
      * @param string $category Category string
+     * @param string $request_>per_page Number of products to diaplsy per page
      * 
      * @return JSON JSON formatted response
      */
-    public function new($weeks=3, $section=null, $sub_section=null, $category=null){
+    public function new(Request $request, $weeks=3, $section=null, $sub_section=null, $category=null){
 
         /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
+
+        //Set default per_page value for pagination
+        $per_page= 20;
+
+        //if a per_page parameter is included with the request, set it
+        if($request->per_page){
+            $per_page= \intval($request->per_page);
+        }
 
         $products= null;
 
@@ -625,30 +790,30 @@ class ProductController extends Controller
                                             ->where('sub_section', $sub_section)
                                             ->where('category', $category)
                                             ->where('updated_at', '>=', $min_date)
-                                            ->get();
+                                            ->paginate($per_page);
                           
                 }
                 else{
                     $products= Product::where( 'section', $section)
                                             ->where('sub_section', $sub_section)
                                             ->where('updated_at', '>=', $min_date)
-                                            ->get();
+                                            ->paginate($per_page);
                 }
 
             }
             else{
                 $products= Product::where( 'section', $section)
                 ->where('updated_at', '>=', $min_date)
-                ->get();
+                ->paginate($per_page);
             }
 
         }
         else{
-            $products= Product::all()->where('updated_at', '>=', $min_date);
+            $products= Product::where('updated_at', '>=', $min_date)->paginate($per_page);
         }
 
 
-        return response()->json($products, 200);
+        return new ProductCollection($products);
 
     }
 
@@ -672,21 +837,23 @@ class ProductController extends Controller
 
         }
 
-        return response()->json($product, 200);
+        return new ProductResource($product);
 
     }
 
     /**
      * Return result of Product search
      * 
-     * @param string $section
-     * @param string $sub_section
-     * @param string $category
-     * @param string $color
-     * @param double $min_price
-     * @param double $max_price
-     * @param string $brand
-     * @param string $name
+     * @param string $request->section
+     * @param string $request->sub_section
+     * @param string $request->category
+     * @param string $request->color
+     * @param double $request->min_price
+     * @param double $request->max_price
+     * @param string $request->brand
+     * @param string $request->name
+     * 
+     * @param string $request_>per_page Number of products to diaplsy per page
      * 
      * @return JSON JSON formatted response of an array of matched products
      */
@@ -773,6 +940,15 @@ class ProductController extends Controller
             $category_array['category']= $category;
 
 
+        //PAGINATION
+        //Set default per_page value for pagination
+        $per_page= 20;
+
+        //if a per_page parameter is included with the request, set it
+        if($request->per_page){
+            $per_page= \intval($request->per_page);
+        }
+
         //FIND MATCHED PRODUCTS
         $products= Product::where(
                         $category_array
@@ -781,7 +957,7 @@ class ProductController extends Controller
                     ->where('color', 'like', '%' . $color . '%')                    
                     ->where('price', '>=', $min_price)
                     ->where('price', '<=', $max_price)
-                    ->get();
+                    ->paginate($per_page);
 
 
         //if no result is found
@@ -792,7 +968,7 @@ class ProductController extends Controller
             ], 404);
         }
 
-        return response()->json($products, 200);
+        return new ProductCollection($products);
     }
 
 
@@ -904,7 +1080,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Product Added Successfully',
-            'details' => $new_product
+            'data' => $new_product
         ], 201);
 
         
@@ -1128,7 +1304,7 @@ class ProductController extends Controller
 
         return response()->json( [
             'message' => 'Product updated sucessfully',
-            'details' => $product
+            'data' => $product
         ],200);
 
     }
