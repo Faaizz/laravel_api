@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
+use Utility\SimulateLogin;
+
 
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\Product as ProductResource;
@@ -1187,7 +1189,7 @@ class ProductController extends Controller
     public function store(Request $request){
 
         /* ========SIMULATE admin LOGIN========== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
 
         //Validate Authentication
@@ -1333,7 +1335,7 @@ class ProductController extends Controller
     public function update(Request $request, $id){
 
         /* ========SIMULATE admin LOGIN========== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
 
         //Validate Authentication
@@ -1566,7 +1568,7 @@ class ProductController extends Controller
     public function delete($id){
 
         /* ========SIMULATE admin LOGIN========== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
 
         //Validate Authentication
@@ -1630,7 +1632,7 @@ class ProductController extends Controller
     public function massDelete(Request $request){
 
         /* ========SIMULATE admin LOGIN========== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
 
         //Validate Authentication
@@ -1726,55 +1728,6 @@ class ProductController extends Controller
         }
 
         return response()->json([], 204);
-
-    }
-
-
-
-    /* ============================================================ */
-    /*  U   T   I   L   I   T   Y       F   U   N   C   T   I   O   N   S */
-
-
-    /**
-     * Simulate Customer Login
-     */
-    protected function simulateCustomerLogin(){
-
-        //Login the last customer
-        $customer= Customer::find('brown29@example.net');
-
-        if( !$customer ){
-            $customer= Customer::all()->last();
-        }
-
-        Auth::guard('web')->login($customer);
-
-    }
-
-    /**
-     * Simulate Staff Login
-     */
-    protected function simulateStaffLogin(){
-
-        //Login the last Staff
-        $staff= Staff::find('aishayetunde');
-
-        if( !$staff ){
-            $staff= Staff::all()->last();
-        }
-
-        Auth::guard('staffs')->login($staff);
-
-    }
-
-    /**
-     * Simulate Admin Login
-     */
-    protected function simulateAdminLogin(){
-
-        //Login the last Staff
-        $staff= Staff::where('privilege_level', 'admin')->first();
-        Auth::guard('staffs')->login($staff);
 
     }
 

@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
+use Utility\SimulateLogin;
+
 class SettingController extends Controller
 {
 
@@ -157,6 +159,9 @@ class SettingController extends Controller
                         'failed_authorization' => [
                             'failed_authentication' => 'Please login as an admin'
                         ],
+                        'failed_validation' => [
+                            'field' => 'Validation message'
+                        ],
                         'errors' => [
                             'error' => 'error message'
                         ],
@@ -255,7 +260,7 @@ class SettingController extends Controller
     public function index(){
 
         /**========SIMULATE ADMIN LOGIN=========== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
         //Validate Authentication
         //If no staff is signed in
@@ -303,7 +308,7 @@ class SettingController extends Controller
     public function show($name){
 
         /**========SIMULATE ADMIN LOGIN=========== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
         //Validate Authentication
         //If no staff is signed in
@@ -346,53 +351,96 @@ class SettingController extends Controller
         ] ,200);
 
     }
+
+
+    /* C  R  E  A  T  E */
+
+    //Save new Setting
+    /**
+     * Cave a new Setting to database
+     * 
+     * @param $request->name Setting name
+     * @param $request->content JSON formatted string of setting contents
+     * 
+     * @return JSON JSON formatted Response
+     */
+    public function store(Request $request){
+
+        /**========SIMULATE ADMIN LOGIN=========== */
+        SimulateLogin::admin();
+
+        //Validate Authentication
+        //If no staff is signed in
+        if( !Auth::guard('staffs')->check() ){
+
+            return response()->json( [
+                "failed_authentication" => "Please login." 
+            ], 401);
+
+        }
+
+        //If staff is logged in, check if she's admin
+        $staff= Auth::guard('staffs')->user();
+        //If no
+        if( !$staff->isAdmin() ){
+
+            return response()->json( [
+                "failed_authorization" => "Please login as admin." 
+            ], 401);
+
+        }
+
+
+        //SUCCESS Authentication and Authorization
+
+        //VALIDATION
+        $rules= [
+            'name' => 'required|max:100|string',
+            'content' => 'required|JSON'
+        ];
+
+        //Validator
+        $request_validator= Validator::make($request->all(), $rules);
+
+        //Failed Validation
+        if( $request_validator->fails() ){
+
+            return response()->json( $request_validator->errors() ,401);
+
+        }
+
+        //SUCCESS VALIDATION
+        $setting= new Setting();
+
+        $setting->name= trim($request->name);
+        $setting->content= $request->content;
+
+        //Save to Database
+        $setting->save();
+
+        //Verify Save
+        $saved_setting= Setting::find($setting->name);
+
+        //If not found
+        if( !$saved_setting ){
+
+            return response()->json( [
+                'error' => 'An unexpected error occurred. Could not save setting to database.'
+            ] ,500);
+        }
+
+        //SUCCESS
+        return response()->json( [], 201);
+
+
+    }
+
+
+    /* U P D A T E */
+
+    /**
+     * Update the contents of an existing setting
+     */
     
-
-    /* ============================================================ */
-    /*  U   T   I   L   I   T   Y       F   U   N   C   T   I   O   N   S */
-
-
-    /**
-     * Simulate Customer Login
-     */
-    protected function simulateCustomerLogin(){
-
-        //Login the last customer
-        $customer= Customer::find('brown29@example.net');
-
-        if( !$customer ){
-            $customer= Customer::all()->last();
-        }
-
-        Auth::guard('web')->login($customer);
-
-    }
-
-    /**
-     * Simulate Staff Login
-     */
-    protected function simulateStaffLogin(){
-
-        //Login the last Staff
-        $staff= Staff::find('aishayetunde');
-
-        if( !$staff ){
-            $staff= Staff::all()->last();
-        }
-
-        Auth::guard('staffs')->login($staff);
-
-    }
-
-    /**
-     * Simulate Admin Login
-     */
-    protected function simulateAdminLogin(){
-
-        //Login the last Staff
-        $staff= Staff::where('privilege_level', 'admin')->first();
-        Auth::guard('staffs')->login($staff);
-
-    }
 
 }

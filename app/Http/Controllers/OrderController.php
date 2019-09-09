@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
+use Utility\SimulateLogin;
+
 //RESOURCES
 use App\Http\Resources\OrderCollection;
 use App\Http\Resources\Order as OrderResource;
@@ -866,7 +868,7 @@ class OrderController extends Controller
     public function ordersByStatus($per_page, $status){
 
         /* ======SIMULATE ADMIN LOGIN======== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
 
         //CHECK IF NUMBER OF ORDERS PER PAGE IS SET, OTHERWISE DEFAULT TO 20
@@ -1169,8 +1171,8 @@ class OrderController extends Controller
     public function customer(Request $request, $email){
 
         /* ========SIMULATE CUSTOMER LOGIN========== */
-        $this->simulateCustomerLogin();
-        //$this->simulateAdminLogin();
+        SimulateLogin::customer();
+        //SimulateLogin::admin();
 
         //Call ordersByEmail() utility function
         return $this->ordersByEmail($request->per_page, $email, 'customer', $request->status);
@@ -1196,7 +1198,7 @@ class OrderController extends Controller
     public function staff(Request $request, $email){
 
         /* ========SIMULATE staff LOGIN========== */
-        $this->simulateStaffLogin();
+        SimulateLogin::staff();
 
         //Call ordersByEmail() utility function
         return $this->ordersByEmail($request->per_page, $email, 'staff', $request->status);
@@ -1225,7 +1227,7 @@ class OrderController extends Controller
         $per_page= intval($request->per_page) ?: 20;
 
         /* ========SIMULATE admin LOGIN========== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
 
         //Validate Authentication
@@ -1303,7 +1305,7 @@ class OrderController extends Controller
     public function show($id){
 
         /* ========SIMULATE admin LOGIN========== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
 
         //find order with specified id
@@ -1418,7 +1420,7 @@ class OrderController extends Controller
     public function store(Request $request){
 
         /* =======SIMULATE CUSTOMER LOGIN========= */
-        $this->simulateCustomerLogin();
+        SimulateLogin::customer();
 
         //Check customer authentication
         if ( !Auth::guard('web')->check() ){
@@ -1554,7 +1556,7 @@ class OrderController extends Controller
 
 
         /* ========SIMULATE staff LOGIN========== */
-        $this->simulateStaffLogin();
+        SimulateLogin::staff();
 
 
         //find order with specified id
@@ -1713,7 +1715,7 @@ class OrderController extends Controller
     public function delete($id){
 
         /* ========SIMULATE admin LOGIN========== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
 
         //Validate Authentication
@@ -1786,7 +1788,7 @@ class OrderController extends Controller
     public function massDelete(Request $request){
 
         /* ========SIMULATE admin LOGIN========== */
-        $this->simulateAdminLogin();
+        SimulateLogin::admin();
 
 
         //Validate Authentication
@@ -1909,52 +1911,5 @@ class OrderController extends Controller
 
     }
 
-
-    /* ============================================================ */
-    /*  U   T   I   L   I   T   Y       F   U   N   C   T   I   O   N   S */
-
-
-    /**
-     * Simulate Customer Login
-     */
-    protected function simulateCustomerLogin(){
-
-        //Login the last customer
-        $customer= Customer::find('brown29@example.net');
-
-        if( !$customer ){
-            $customer= Customer::all()->last();
-        }
-
-        Auth::guard('web')->login($customer);
-
-    }
-
-    /**
-     * Simulate Staff Login
-     */
-    protected function simulateStaffLogin(){
-
-        //Login the last Staff
-        $staff= Staff::find('aishayetunde');
-
-        if( !$staff ){
-            $staff= Staff::all()->last();
-        }
-
-        Auth::guard('staffs')->login($staff);
-
-    }
-
-    /**
-     * Simulate Admin Login
-     */
-    protected function simulateAdminLogin(){
-
-        //Login the last Staff
-        $staff= Staff::where('privilege_level', 'admin')->first();
-        Auth::guard('staffs')->login($staff);
-
-    }
 
 }

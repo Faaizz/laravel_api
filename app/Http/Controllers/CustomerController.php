@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+use Utility\SimulateLogin;
+
 //RESOURCES
 use App\Http\Resources\Customer as CustomerResource;
 use App\Http\Resources\CustomerCollection;
@@ -696,7 +698,7 @@ class CustomerController extends Controller
      */
     public function logout(){
 
-        $this->simulateCustomerLogin();
+        SimulateLogin::customer();
 
         //If no user is logged in, return an error reponse
         if ( !Auth::guard('web')->check() ){
@@ -755,7 +757,7 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $this->simulateStaffLogin();
+        SimulateLogin::staff();
         //========================================================
 
 
@@ -795,7 +797,7 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $this->simulateStaffLogin();
+        SimulateLogin::staff();
         //========================================================
 
 
@@ -851,7 +853,7 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
 
        //Simulate Admin login
-       $this->simulateStaffLogin();
+       SimulateLogin::staff();
 
        //Check staff login. Return an error is no staff is authenticated
        if(!Auth::guard('staffs')->check()){
@@ -941,7 +943,7 @@ class CustomerController extends Controller
         
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $this->simulateCustomerLogin();
+        SimulateLogin::customer();
         //========================================================
         
         //If the current user is not authenticated
@@ -1086,7 +1088,7 @@ class CustomerController extends Controller
 
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $this->simulateCustomerLogin();
+        SimulateLogin::customer();
         //========================================================
 
         //If the current user is not authenticated
@@ -1192,7 +1194,7 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        $this->simulateStaffLogin();
+        SimulateLogin::staff();
         //========================================================
 
         
