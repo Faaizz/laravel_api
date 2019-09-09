@@ -30,7 +30,7 @@ class AddTables extends Migration
             $table->string('color', 50);
             $table->string('material', 50);
             $table->json('images');
-            $table->json('size_and_quantity');
+            $table->json('options');
             $table->timestamps();
         });
     
@@ -39,9 +39,11 @@ class AddTables extends Migration
          * Settings Table
          */
         Schema::create('settings', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->string('name');
             $table->json('content');
             $table->timestamps();
+
+            $table->primary('name');
         });
 
         /**
@@ -73,11 +75,10 @@ class AddTables extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('product_id');
-            $table->string('product_color', 100);
             $table->string('product_size', 100);
             $table->integer('product_quantity');
             $table->string('customer_email', 100);
-            $table->string('staff_email', 100);
+            $table->string('staff_email', 100)->nullable();
             $table->enum('status', ["pending", "delivered", "failed"])->default("pending");
             $table->dateTime('est_del_date')->comment('estimated delivery date')->nullable();
             $table->dateTime('failure_date')->nullable();
@@ -122,6 +123,8 @@ class AddTables extends Migration
     public function down()
     {
         Schema::dropIfExists('orders');
+
+        Schema::dropIfExists('products');
         //DELETE IMAGES
         $images_arrays= DB::table('products')->pluck('images');
         $images_array= $images_arrays->flatten();
@@ -135,8 +138,7 @@ class AddTables extends Migration
             }
         }
 
-
-        Schema::dropIfExists('products');
+        
         Schema::dropIfExists('settings');
         Schema::dropIfExists('customers');
         Schema::dropIfExists('staffs');

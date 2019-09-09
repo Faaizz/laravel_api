@@ -28,7 +28,7 @@ $factory->define(Product::class, function (Faker $faker) {
         'images'=> json_encode(
             []
         ),
-        'size_and_quantity'=> json_encode(
+        'options'=> json_encode(
             []
         )
 

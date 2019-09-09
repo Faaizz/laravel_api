@@ -26,7 +26,6 @@ $factory->define(Order::class, function (Faker $faker) {
         
         //select a random product for the order
         'product_id' => $products->random()->id,
-        'product_color' => $faker->colorName,
         'product_size' => $productSizes[ rand(0, (count($productSizes) - 1) )],
         'product_quantity' => $faker->randomDigit,
         //select a random customer for the order

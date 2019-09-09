@@ -211,3 +211,112 @@ Route::middleware('auth:api')->delete('/customers/{email}', 'CustomerController@
 
 //DELETE STAFF
 Route::middleware('auth:api')->delete('/staff/{email}', 'StaffController@delete');
+
+
+
+
+/** =================================================================================================================== */
+
+/**
+ *  O  R  D  E  R       R   O   U   T   E   S
+ */
+
+
+ /* O  P  T  I  O  N  S */
+ Route::options('/orders', 'OrderController@options');
+
+
+ /* R  E  A  D */
+
+  //All Orders
+  Route::middleware('auth:api')->get('/orders', 'OrderController@index');
+
+ //All Pending Orders
+ Route::middleware('auth:api')->get('/orders/pending', 'OrderController@pending');
+
+ //All Delivered Orders
+ Route::middleware('auth:api')->get('/orders/delivered', 'OrderController@delivered');
+
+ //All Failed Orders
+ Route::middleware('auth:api')->get('/orders/failed', 'OrderController@failed');
+
+  //Single Order
+  Route::middleware('auth:api')->get('/orders/{id}', 'OrderController@show')
+                                ->where(
+                                        'id', '[0-9]+'
+                                        );
+
+ //By Customer
+ Route::middleware('auth:api')->get('/orders/customer/{email}', 'OrderController@customer');
+
+  //By Staff
+  Route::middleware('auth:api')->get('/orders/staff/{email}', 'OrderController@staff');
+
+  //By Product
+  Route::middleware('auth:api')->get('/orders/product/{id}', 'OrderController@product')
+                                ->where(
+                                        'id', '[0-9]+'
+                                );
+
+
+ /* C  R  E  A  T  E */
+ 
+ //ADD ORDER
+ Route::middleware('auth:api')->post('/orders', 'OrderController@store');
+
+
+ /* U  P  D  A  T  E */
+ 
+ //CHANGE ORDER STATUS
+ Route::middleware('auth:api')->post('/orders/update_status/{id}', 'OrderController@updateStatus')
+                                ->where(
+                                        'id', '[0-9]+'
+                                        );
+ 
+ /* D  E  L  E  T  E */
+
+//DELETE ORDER
+Route::middleware('auth:api')->delete('/orders/{id}', 'OrderController@delete')
+                                ->where(
+                                        'id', '[0-9]+'
+                                        );
+
+//DELETE MULTIPLE
+Route::middleware('auth:api')->post('/orders/mass_delete', 'OrderController@massDelete');
+
+
+
+/** =================================================================================================================== */
+
+/**
+ *  S  E  T  T  I  N  G  S       R   O   U   T   E   S
+ */
+
+
+ /* O  P  T  I  O  N  S */
+ Route::options('/settings', 'SettingController@options');
+
+ /* R  E  A  D */
+
+ //All SETTING
+ Route::middleware('auth:api')->get('/settings', 'SettingController@index');
+
+ //Single SETTING
+ Route::middleware('auth:api')->get('/settings/{name}', 'SettingController@show');
+
+
+ /* C  R  E  A  T  E */
+ 
+ //ADD SETTING
+ Route::middleware('auth:api')->post('/settings', 'SettingController@store');
+
+
+ /* U  P  D  A  T  E */
+ 
+ //UPDATE SETTING
+ Route::middleware('auth:api')->post('/settings/{name}', 'SettingController@update');
+ 
+ /* D  E  L  E  T  E */
+
+//DELETE SETTING
+Route::middleware('auth:api')->delete('/settings/{name}', 'SettingController@delete');

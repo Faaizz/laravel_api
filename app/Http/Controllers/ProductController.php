@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 
 use App\Product;
 use App\Order;
+use App\Staff;
 
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 
 use App\Http\Resources\ProductCollection;
@@ -42,8 +44,89 @@ class ProductController extends Controller
             ],
             
             'endpoints' => [
+                /* STRUCTURE
+                
+                [
+                    'path' => '',
+                    'method' => '',
+                    'description' => '',
+                    'authentication' => [
+                        'api' => 'token',
+                        'login' => ''
+                    ],
+                    'args' => [
 
-                //READ
+                        'ROUTE' => [
+                            '' => [
+                                'required' => true,
+                                'description' => '',
+                                'type' => ''
+                            ]
+                        ],
+
+                        'GET' => [
+                            '' => [
+                                'required' => true,
+                                'description' => '',
+                                'type' => ''
+                            ]
+                        ],
+
+                        'POST' => [
+                            '' => [
+                                'required' => true,
+                                'description' => '',
+                                'type' => ''
+                            ]
+                        ]
+                    ],
+                    'return_type' => 'json',
+                    'return_data_type' => [
+                        'failed_authentication' => [
+                            'error' => 'Please login'
+                        ],
+                        'failed_authorization' => [
+                            'error' => 'Please login as admin'
+                        ],
+                        'failed_verification' => [
+                            'field' => 'validation message'
+                        ],
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        //success
+                        'success' => [
+                            'data' => [
+
+                            ],
+                            'links' => [
+
+                                    'first' => 'string',
+                                    'last' => 'string',
+                                    'prev' => 'string',
+                                    'next' => 'string'
+
+                            ],
+                            'meta' => [
+
+                                    'current_page' => 'integer',
+                                    'from' => 'integer',
+                                    'last_page' => 'integer',
+                                    'path' => 'string',
+                                    'per_page' => 'integer',
+                                    'to' => 'integer',
+                                    'total' => 'integer'
+                                    
+                            ]
+                            
+                        ]
+                    ]
+                ]
+                
+                
+                */
+
+                //OPTIONS
 
                 [
                     'path' => '/',
@@ -56,6 +139,9 @@ class ProductController extends Controller
                     'return_type' => 'json',
                     'return_structure' => []
                 ],
+
+
+                //READ
 
                 [
                     'path' => '/{section?}/{sub_section?}/{category?}',
@@ -100,39 +186,46 @@ class ProductController extends Controller
                     ],
                     'return_type' => 'array: json',
                     'return_data_structure' => [
-                        'data' => [
-                            [
-                                'id' => 'integer',
-                                'name' => 'srting',
-                                'brand' => 'string',
-                                'description' => 'string',
-                                'section' => 'string',
-                                'sub_section' => 'string',
-                                'category' => 'string',
-                                'price' => 'double',
-                                'color' => 'string',
-                                'material' => 'string',
-                                'images' => 'array["string"]',
-                                'options' => 'array',
-                                'created_at' => 'string',
-                                'updated_at' => 'string'
 
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        //success
+                        'success' => [
+                            'data' => [
+                                [
+                                    'id' => 'integer',
+                                    'name' => 'srting',
+                                    'brand' => 'string',
+                                    'description' => 'string',
+                                    'section' => 'string',
+                                    'sub_section' => 'string',
+                                    'category' => 'string',
+                                    'price' => 'double',
+                                    'color' => 'string',
+                                    'material' => 'string',
+                                    'images' => 'array["string"]',
+                                    'options' => 'array',
+                                    'created_at' => 'string',
+                                    'updated_at' => 'string'
+
+                                ]
+                            ],
+                            "links" => [
+                                    "first" => "string",
+                                    "last" => "string",
+                                    "prev" => "string",
+                                    "next" => "string"
+                            ],
+                            "meta" => [
+                                    "current_page" => "integer",
+                                    "from" => "integer",
+                                    "last_page" => "integer",
+                                    "path" => "string",
+                                    "per_page" => "integer",
+                                    "to" => "integer",
+                                    "total" => "integer"
                             ]
-                        ],
-                        "links" => [
-                                "first" => "string",
-                                "last" => "string",
-                                "prev" => "string",
-                                "next" => "string"
-                        ],
-                        "meta" => [
-                                "current_page" => "integer",
-                                "from" => "integer",
-                                "last_page" => "integer",
-                                "path" => "string",
-                                "per_page" => "integer",
-                                "to" => "integer",
-                                "total" => "integer"
                         ]
                     ]
                 ],
@@ -148,6 +241,11 @@ class ProductController extends Controller
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
+                                'type' => 'integer'
+                            ],
+                            'per_page' => [
+                                'required' => false,
+                                'description' => 'number of products to return per page',
                                 'type' => 'integer'
                             ]
                         ],
@@ -182,43 +280,51 @@ class ProductController extends Controller
                     ],
                     'return_type' => 'array: json',                        
                     'return_data_structure' => [
-                        'data' => [
-                            [
-                                'id' => 'integer',
-                                'name' => 'srting',
-                                'brand' => 'string',
-                                'description' => 'string',
-                                'section' => 'string',
-                                'sub_section' => 'string',
-                                'category' => 'string',
-                                'price' => 'double',
-                                'color' => 'string',
-                                'material' => 'string',
-                                'images' => 'array',
-                                'options' => 'array',
-                                'created_at' => 'string',
-                                'updated_at' => 'string'
 
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        //success
+                        'success' => [
+                            'data' => [
+                                [
+                                    'id' => 'integer',
+                                    'name' => 'srting',
+                                    'brand' => 'string',
+                                    'description' => 'string',
+                                    'section' => 'string',
+                                    'sub_section' => 'string',
+                                    'category' => 'string',
+                                    'price' => 'double',
+                                    'color' => 'string',
+                                    'material' => 'string',
+                                    'images' => 'array',
+                                    'options' => 'array',
+                                    'created_at' => 'string',
+                                    'updated_at' => 'string'
+
+                                ]
+                            ],
+                            "links" => [
+                                    "first" => "string",
+                                    "last" => "string",
+                                    "prev" => "string",
+                                    "next" => "string"
+                            ],
+                            "meta" => [
+                                    "current_page" => "integer",
+                                    "from" => "integer",
+                                    "last_page" => "integer",
+                                    "path" => "string",
+                                    "per_page" => "integer",
+                                    "to" => "integer",
+                                    "total" => "integer"
                             ]
-                        ],
-                        "links" => [
-                                "first" => "string",
-                                "last" => "string",
-                                "prev" => "string",
-                                "next" => "string"
-                        ],
-                        "meta" => [
-                                "current_page" => "integer",
-                                "from" => "integer",
-                                "last_page" => "integer",
-                                "path" => "string",
-                                "per_page" => "integer",
-                                "to" => "integer",
-                                "total" => "integer"
                         ]
                     ]
                 ],
 
+                //Single Product
                 [
                     'path' => '/{id}',
                     'method' => 'GET',
@@ -238,21 +344,27 @@ class ProductController extends Controller
                     'return_type' => 'json',                    
                     'return_data_structure' => [
 
-                        'data' => [                        
-                            'id' => 'integer',
-                            'name' => 'string',
-                            'brand' => 'string',
-                            'description' => 'string',
-                            'section' => 'string',
-                            'sub_section' => 'string',
-                            'category' => 'string',
-                            'price' => 'double',
-                            'color' => 'string',
-                            'material' => 'string',
-                            'images' => 'array',
-                            'options' => 'array',
-                            'created_at' => 'string',
-                            'updated_at' => 'string'
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        //success
+                        'success' => [
+                            'data' => [                        
+                                'id' => 'integer',
+                                'name' => 'string',
+                                'brand' => 'string',
+                                'description' => 'string',
+                                'section' => 'string',
+                                'sub_section' => 'string',
+                                'category' => 'string',
+                                'price' => 'double',
+                                'color' => 'string',
+                                'material' => 'string',
+                                'images' => 'array',
+                                'options' => 'array',
+                                'created_at' => 'string',
+                                'updated_at' => 'string'
+                            ]
                         ]
                         
                     ]
@@ -269,6 +381,11 @@ class ProductController extends Controller
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
+                                'type' => 'integer'
+                            ],
+                            'per_page' => [
+                                'required' => false,
+                                'description' => 'number of products to return per page',
                                 'type' => 'integer'
                             ]
                         ],
@@ -335,39 +452,48 @@ class ProductController extends Controller
                     'return_type' => 'array: json',                    
                     'return_data_structure' => [
 
-                        'data' => [
-                            [
-                                'id' => 'integer',
-                                'name' => 'string',
-                                'brand' => 'string',
-                                'description' => 'string',
-                                'section' => 'string',
-                                'sub_section' => 'string',
-                                'category' => 'string',
-                                'price' => 'double',
-                                'color' => 'string',
-                                'material' => 'string',
-                                'images' => 'array',
-                                'options' => 'array',
-                                'created_at' => 'string',
-                                'updated_at' => 'string'
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        'failed_verification' => [
+                            'field' => 'validation message'
+                        ],
+                        //success
+                        'success' => [
+                            'data' => [
+                                [
+                                    'id' => 'integer',
+                                    'name' => 'string',
+                                    'brand' => 'string',
+                                    'description' => 'string',
+                                    'section' => 'string',
+                                    'sub_section' => 'string',
+                                    'category' => 'string',
+                                    'price' => 'double',
+                                    'color' => 'string',
+                                    'material' => 'string',
+                                    'images' => 'array',
+                                    'options' => 'array',
+                                    'created_at' => 'string',
+                                    'updated_at' => 'string'
 
+                                ]
+                            ],
+                            "links" => [
+                                    "first" => "string",
+                                    "last" => "string",
+                                    "prev" => "string",
+                                    "next" => "string"
+                            ],
+                            "meta" => [
+                                    "current_page" => "integer",
+                                    "from" => "integer",
+                                    "last_page" => "integer",
+                                    "path" => "string",
+                                    "per_page" => "integer",
+                                    "to" => "integer",
+                                    "total" => "integer"
                             ]
-                        ],
-                        "links" => [
-                                "first" => "string",
-                                "last" => "string",
-                                "prev" => "string",
-                                "next" => "string"
-                        ],
-                        "meta" => [
-                                "current_page" => "integer",
-                                "from" => "integer",
-                                "last_page" => "integer",
-                                "path" => "string",
-                                "per_page" => "integer",
-                                "to" => "integer",
-                                "total" => "integer"
                         ]
                     ]
                 ],
@@ -389,6 +515,11 @@ class ProductController extends Controller
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
+                                'type' => 'integer'
+                            ],
+                            'per_page' => [
+                                'required' => false,
+                                'description' => 'number of products to return per page',
                                 'type' => 'integer'
                             ]
                         ],
@@ -481,22 +612,37 @@ class ProductController extends Controller
                     'return_type' => 'json',                    
                     'return_data_structure' => [
 
-                        'message' => 'create message',
-                        'data' => [
-                            'id' => 'integer',
-                            'name' => 'srting',
-                            'brand' => 'string',
-                            'description' => 'string',
-                            'section' => 'string',
-                            'sub_section' => 'string',
-                            'category' => 'string',
-                            'price' => 'double',
-                            'color' => 'string',
-                            'material' => 'string',
-                            'images' => 'array',
-                            'options' => 'array',
-                            'created_at' => 'string',
-                            'updated_at' => 'string'
+                        'failed_authentication' => [
+                            'failed_authentication' => 'Please login'
+                        ],
+                        'failed_authorization' => [
+                            'failed_authorization' => 'Please login as admin'
+                        ],
+                        'failed_verification' => [
+                            'field' => 'validation message'
+                        ],
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        //success
+                        'success' => [
+                            'message' => 'create message',
+                            'data' => [
+                                'id' => 'integer',
+                                'name' => 'srting',
+                                'brand' => 'string',
+                                'description' => 'string',
+                                'section' => 'string',
+                                'sub_section' => 'string',
+                                'category' => 'string',
+                                'price' => 'double',
+                                'color' => 'string',
+                                'material' => 'string',
+                                'images' => 'array',
+                                'options' => 'array',
+                                'created_at' => 'string',
+                                'updated_at' => 'string'
+                            ]
                         ]
 
                     ]
@@ -528,61 +674,61 @@ class ProductController extends Controller
                         'POST' => [
 
                             'name' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product name',
                                 'type' => 'string'
                             ],
 
                             'brand' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product brand',
                                 'type' => 'string'
                             ],
 
                             'description' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product description',
                                 'type' => 'string'
                             ],
 
                             'section' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product section',
                                 'type' => 'string'
                             ],
 
                             'sub_section' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product sub section',
                                 'type' => 'string'
                             ],
 
                             'category' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product sub section',
                                 'type' => 'string'
                             ],
 
                             'color' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product color',
                                 'type' => 'string'
                             ],
 
                             'price' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product price',
                                 'type' => 'double'
                             ],
 
                             'material' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product material',
                                 'type' => 'string'
                             ],
 
                             'size_and_quantity' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Array of product sizes and corresponding qunatity of each',
                                 'type' => 'array: array[
                                     "size" => string,
@@ -591,19 +737,19 @@ class ProductController extends Controller
                             ],
                             
                             'image_one' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product image one',
                                 'type' => '.png | .jpg | .gif'
                             ],
 
                             'image_two' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product image two',
                                 'type' => '.png | .jpg | .gif'
                             ],
 
                             'image_three' => [
-                                'required' => true,
+                                'required' => false,
                                 'description' => 'Product image three',
                                 'type' => '.png | .jpg | .gif'
                             ]
@@ -613,22 +759,38 @@ class ProductController extends Controller
                     'return_type' => 'json',                    
                     'return_data_structure' => [
 
-                        'message' => 'update message',
-                        'data' => [
-                            'id' => 'integer',
-                            'name' => 'srting',
-                            'brand' => 'string',
-                            'description' => 'string',
-                            'section' => 'string',
-                            'sub_section' => 'string',
-                            'category' => 'string',
-                            'price' => 'double',
-                            'color' => 'string',
-                            'material' => 'string',
-                            'images' => 'array',
-                            'options' => 'array',
-                            'created_at' => 'string',
-                            'updated_at' => 'string'     
+                        'failed_authentication' => [
+                            'failed_authentication' => 'Please login'
+                        ],
+                        'failed_authorization' => [
+                            'failed_authorization' => 'Please login as admin'
+                        ],
+                        'failed_verification' => [
+                            'field' => 'validation message'
+                        ],
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        //success
+                        'success' => [
+
+                            'message' => 'update message',
+                            'data' => [
+                                'id' => 'integer',
+                                'name' => 'srting',
+                                'brand' => 'string',
+                                'description' => 'string',
+                                'section' => 'string',
+                                'sub_section' => 'string',
+                                'category' => 'string',
+                                'price' => 'double',
+                                'color' => 'string',
+                                'material' => 'string',
+                                'images' => 'array',
+                                'options' => 'array',
+                                'created_at' => 'string',
+                                'updated_at' => 'string'     
+                            ]
                         ]
 
                     ]
@@ -658,15 +820,30 @@ class ProductController extends Controller
                         ]
                     ],
                     'return_type' => 'json',
-                    'return_data_structure' => null
+                    'return_data_structure' => [
+                        
+                        'failed_authentication' => [
+                            'failed_authentication' => 'Please login'
+                        ],
+                        'failed_authorization' => [
+                            'failed_authorization' => 'Please login as admin'
+                        ],
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        //success
+                        'success' => 'Empty response with 204 response code'
+                    ]
                 ],
 
+                //Mass Delete
                 [
                     'path' => '/mass_delete',
                     'method' => 'POST',
                     'description' => 'delete multiple products',
                     'authentication' => [
-                        'token'
+                        'api' => 'token',
+                        'login' => 'admin'
                     ],
                     'args' => [
 
@@ -675,14 +852,28 @@ class ProductController extends Controller
                             'ids' => [
                                 'required' => true,
                                 'description' => 'ids of products to delete',
-                                'type' => 'arrray: string'
+                                'type' => 'JSON arrray: integer'
                             ]
 
                         ]
                     ],
                     'return_type' => 'json',
                     'return_data_structure' => [
-                        'message' => 'string'
+                        
+                        'failed_authentication' => [
+                            'failed_authentication' => 'Please login'
+                        ],
+                        'failed_authorization' => [
+                            'failed_authorization' => 'Please login as admin'
+                        ],
+                        'failed_verification' => [
+                            'field' => 'validation message'
+                        ],
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        //success
+                        'success' => 'Empty response with 204 response code'
                     ]
                 ]
 
@@ -995,7 +1186,32 @@ class ProductController extends Controller
      */
     public function store(Request $request){
 
-        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
+        /* ========SIMULATE admin LOGIN========== */
+        $this->simulateAdminLogin();
+
+
+        //Validate Authentication
+        //If no staff is signed in
+        if( !Auth::guard('staffs')->check() ){
+
+            return response()->json( [
+                "failed_authentication" => "Please login." 
+            ], 401);
+
+        }
+
+        //If staff is logged in, check if she's admin
+        $staff= Auth::guard('staffs')->user();
+        //If no
+        if( !$staff->isAdmin() ){
+
+            return response()->json( [
+                "failed_authorization" => "Please login as admin." 
+            ], 401);
+
+        }
+        
+        
 
         //VALIDATION
         $rules= [
@@ -1025,7 +1241,7 @@ class ProductController extends Controller
         //SUCCESS VALDATION
 
         //Validate "size_and_quantity" JSON array
-        $size_and_quantity= json_decode($request->get('size_and_quantity'));
+        $size_and_quantity= \json_decode($request->get('size_and_quantity'));
         $valid_size_and_quantity= false;
 
         foreach($size_and_quantity as $a_s_and_q){
@@ -1053,6 +1269,11 @@ class ProductController extends Controller
             ] ,401);
         }
 
+        //IF VALID
+        if($valid_size_and_quantity){
+            $size_and_quantity= \json_encode($size_and_quantity);
+        }
+
         //GET PRODUCT IMAGES
         $image_one= $request->file('image_one')->store('products');
         $image_two= $request->file('image_two')->store('products');
@@ -1073,7 +1294,7 @@ class ProductController extends Controller
         $new_product->color= $request->get('color');
         $new_product->price= doubleval($request->get('price'));
         $new_product->material= $request->get('material');
-        $new_product->size_and_quantity= $request->get('size_and_quantity');
+        $new_product->size_and_quantity= $size_and_quantity;
         $new_product->images= json_encode($images);
 
         $new_product->save();    
@@ -1111,7 +1332,32 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id){
 
-        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
+        /* ========SIMULATE admin LOGIN========== */
+        $this->simulateAdminLogin();
+
+
+        //Validate Authentication
+        //If no staff is signed in
+        if( !Auth::guard('staffs')->check() ){
+
+            return response()->json( [
+                "failed_authentication" => "Please login." 
+            ], 401);
+
+        }
+
+        //If staff is logged in, check if she's admin
+        $staff= Auth::guard('staffs')->user();
+        //If no
+        if( !$staff->isAdmin() ){
+
+            return response()->json( [
+                "failed_authorization" => "Please login as admin." 
+            ], 401);
+
+        }
+
+
 
         //VALIDATION
         $rules= [
@@ -1125,7 +1371,7 @@ class ProductController extends Controller
             'price' => 'numeric',
             'color' => 'max:50|string',
             'material' => 'max:50|string',
-            'size_and_quantity' => 'max:100|JSON',
+            'size_and_quantity' => 'JSON',
             'image_one' => 'mimes:jpeg,gif,png',
             'image_two' => 'mimes:jpeg,gif,png',
             'image_three' => 'mimes:jpeg,gif,png',
@@ -1217,7 +1463,7 @@ class ProductController extends Controller
         }
 
         //Validate "size_and_quantity" JSON array
-        $buffer= $request->get('size_and_quantity');
+        $buffer= \json_decode($request->get('size_and_quantity'));
 
         if($buffer){
 
@@ -1247,7 +1493,7 @@ class ProductController extends Controller
 
             //IF VALID
             if($valid_size_and_quantity){
-                $product->size_and_quantity= $buffer;
+                $product->size_and_quantity= \json_encode($buffer);
             }
 
         }
@@ -1319,7 +1565,32 @@ class ProductController extends Controller
      */
     public function delete($id){
 
-        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
+        /* ========SIMULATE admin LOGIN========== */
+        $this->simulateAdminLogin();
+
+
+        //Validate Authentication
+        //If no staff is signed in
+        if( !Auth::guard('staffs')->check() ){
+
+            return response()->json( [
+                "failed_authentication" => "Please login." 
+            ], 401);
+
+        }
+
+        //If staff is logged in, check if she's admin
+        $staff= Auth::guard('staffs')->user();
+        //If no
+        if( !$staff->isAdmin() ){
+
+            return response()->json( [
+                "failed_authorization" => "Please login as admin." 
+            ], 401);
+
+        }
+
+
 
         //Pull product to delete
         $product= Product::find($id);
@@ -1350,7 +1621,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Delete a product
+     * Delete multiple product
      * 
      * @param int $request->ids
      * 
@@ -1358,7 +1629,32 @@ class ProductController extends Controller
      */
     public function massDelete(Request $request){
 
-        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
+        /* ========SIMULATE admin LOGIN========== */
+        $this->simulateAdminLogin();
+
+
+        //Validate Authentication
+        //If no staff is signed in
+        if( !Auth::guard('staffs')->check() ){
+
+            return response()->json( [
+                "failed_authentication" => "Please login." 
+            ], 401);
+
+        }
+
+        //If staff is logged in, check if she's admin
+        $staff= Auth::guard('staffs')->user();
+        //If no
+        if( !$staff->isAdmin() ){
+
+            return response()->json( [
+                "failed_authorization" => "Please login as admin." 
+            ], 401);
+
+        }
+
+
 
         //VALIDATION
         $rules= [
@@ -1413,16 +1709,14 @@ class ProductController extends Controller
             $product->delete();
 
 
-            /* ===TEST THIS============================================================= */
             //verify product was sucessfully deleted
             $product_check= Product::find($product->id);
 
             //if product still exists
-            if($product){
+            if($product_check){
                 $errors[$product->id]= 'Could not delete! an unknown error ocurred.';
                 continue;
             }
-            /* ======================================================================= */
 
         }
 
@@ -1434,5 +1728,55 @@ class ProductController extends Controller
         return response()->json([], 204);
 
     }
+
+
+
+    /* ============================================================ */
+    /*  U   T   I   L   I   T   Y       F   U   N   C   T   I   O   N   S */
+
+
+    /**
+     * Simulate Customer Login
+     */
+    protected function simulateCustomerLogin(){
+
+        //Login the last customer
+        $customer= Customer::find('brown29@example.net');
+
+        if( !$customer ){
+            $customer= Customer::all()->last();
+        }
+
+        Auth::guard('web')->login($customer);
+
+    }
+
+    /**
+     * Simulate Staff Login
+     */
+    protected function simulateStaffLogin(){
+
+        //Login the last Staff
+        $staff= Staff::find('aishayetunde');
+
+        if( !$staff ){
+            $staff= Staff::all()->last();
+        }
+
+        Auth::guard('staffs')->login($staff);
+
+    }
+
+    /**
+     * Simulate Admin Login
+     */
+    protected function simulateAdminLogin(){
+
+        //Login the last Staff
+        $staff= Staff::where('privilege_level', 'admin')->first();
+        Auth::guard('staffs')->login($staff);
+
+    }
+
 
 }

@@ -39,8 +39,15 @@ delivered orders
 #### Read  
 single order   
 
+#### Update  
+change order status
+
 #### Add  
 add order  
+
+#### Delete
+delete order
+delete orders by collection of id
 
 
 </br>  
