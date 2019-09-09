@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 use Utility\SimulateLogin;
+use Utility\AuthorizeAdmin;
 
 class SettingController extends Controller
 {
@@ -262,28 +263,17 @@ class SettingController extends Controller
         /**========SIMULATE ADMIN LOGIN=========== */
         SimulateLogin::admin();
 
-        //Validate Authentication
-        //If no staff is signed in
-        if( !Auth::guard('staffs')->check() ){
+        //Admin Authorization Required
+        $admin_test= new AuthorizeAdmin();
 
-            return response()->json( [
-                "failed_authentication" => "Please login." 
-            ], 401);
+        //If Authorization fails
+        if($admin_test->fails()){
 
-        }
-
-        //If staff is logged in, check if she's admin
-        $staff= Auth::guard('staffs')->user();
-        //If no
-        if( !$staff->isAdmin() ){
-
-            return response()->json( [
-                "failed_authorization" => "Please login as admin." 
-            ], 401);
+            //Return errors
+            return $admin_test->errors();
 
         }
-
-
+        
         //SUCCESS Authentication and Authorization
 
         //Get all existing settings
@@ -441,6 +431,72 @@ class SettingController extends Controller
     /**
      * Update the contents of an existing setting
      */
+    public function update(Requeest $request){
+
+        /* =======SIMULATE LOGIN======= */
+        SimulateLogin::admin();
+
+
+        //SUCCESS Authentication and Authorization
+
+        //VALIDATION
+        $rules= [
+            'name' => 'required|max:100|string',
+            'content' => 'required|JSON'
+        ];
+
+        //Validator
+        $request_validator= Validator::make($request->all(), $rules);
+
+        //Failed Validation
+        if( $request_validator->fails() ){
+
+            return response()->json( $request_validator->errors() ,401);
+
+        }
+
+        //SUCCESS Validation
+        
+        //Check if setitng exists
+        $setting= Setting::find(trim($request->name));
+
+        //If setting doesn't exist
+        if( !$setting ){
+
+            return response()->json(  [
+                'error' => 'Error! Setting with the name ' . $request->name . ' does not exist.'
+            ] ,404);
+
+        }
+
+        //If setting is found, replace it's content
+        $setting->content= $request->content;
+
+        //SUCCESS
+        return response()->json( [
+            'message' => 'Update successfully',
+            'data' => $setting
+        ] ,200);
+        
+
+    }
+
+
+    
+    /* D E L E T E */
+    /**
+     * Delete setting with specified name
+     * 
+     * @param $name Route parameter
+     * 
+     * @return JSON JSON formatted Response
+     */
+    public function delete($name){
+
+
+
+    }
+
     
 
 }
