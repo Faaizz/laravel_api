@@ -2,7 +2,10 @@
 
 namespace Utility;
 
+use Illuminate\Http\Request;
+
 use App\Staff;
+use  App\Http\Controllers\StaffController;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -11,10 +14,10 @@ class AuthorizeAdmin extends AuthenticateStaff{
     //$valid_staff inherited from AuthenticateStaff class
     protected $valid_admin= false;
 
-    function __construct(){
+    function __construct(Request $request){
 
         //Call AuthenticateStaff contructor to validate staff login
-        parent::__construct();
+        parent::__construct($request);
 
         //If staff is logged in
         if( $this->valid_staff ){

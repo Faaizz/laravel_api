@@ -528,6 +528,27 @@ class StaffController extends Controller
         }
 
 
+        $login_attempt= StaffController::cookie_login_facilitator($remember_cookie);
+
+         //FAILED LOGIN
+         if( !$login_attempt ){
+            return redirect()->route('staff_manual_login');
+        }
+
+        //SUCCESS AUTHENTICATION
+        return response()->json([
+            'message' => 'Authentication Successful.'
+        ], 200);
+        
+
+    }
+
+
+    /**
+     * Static method to facilitate Cookie login
+     */
+    public static function cookie_login_facilitator($remember_cookie){
+
         //Check for Staff with matching cookie
         $staff_login= Staff::where('remember_token', $remember_cookie)->first();
 
@@ -545,14 +566,11 @@ class StaffController extends Controller
 
         //FAILED LOGIN
         if( !Auth::guard('staffs')->check() ){
-            return redirect()->route('staff_manual_login');
+            return false;
         }
 
         //SUCCESS AUTHENTICATION
-        return response()->json([
-            'message' => 'Authentication Successful.'
-        ], 200);
-        
+        return true;
 
     }
 
@@ -626,36 +644,48 @@ class StaffController extends Controller
 
         //SUCCESS AUTHENTICATION
 
-        //If user sets "remember" to "yes", generate a cookie, store in database and send back to user
-        if( $request->remember == "yes" ){
+        //Generate Token
+        $token= Str::random(100);
 
-            //Generate Token
-            $token= Str::random(100);
+        //Add token to Staff instance
+        $staff_login->remember_token= $token;
+        $staff_login->save();
 
-            //Add token to Staff instance
-            $staff_login->remember_token= $token;
-            $staff_login->save();
+        //refresh the Staff instance
+        $staff_login= $staff_login->fresh();
 
-            //refresh the Staff instance
-            $staff_login= $staff_login->fresh();
+        //Verify saving success
+        $save_success= ($staff_login->remember_token == $token);
 
-            //Verify saving success
-            $save_success= ($staff_login->remember_token == $token);
+        //If token was saved successfully, send as a "X-REMMEBER" cookie with the response
+        if($save_success){
 
-            //If token was saved successfully, send as a "X-REMMEBER" cookie with the response
-            if($save_success){
+            //If user sets "remember" to "yes", generate a cookie, store in database and send back to user
+            if( $request->remember == "yes" ){
 
+                //Send back cookie that doesn't expire
                 return response()->json([
                     'message' => 'Authentication Successful.'
                 ], 200)->cookie('X-REMEMBER', $token);  
 
+                
             }
+
+            //Otherwise if "remember" is set to "no", login for 60 minutes
+            return response()->json([
+                'message' => 'Authentication Successful.'
+            ], 200)->cookie('X-REMEMBER', $token, 60);  
+
         }
 
-        //Otherwise
-        return response()->json([
-            'message' => 'Authentication Successful.'
-        ], 200);
+        //If "remember_token could not be saved succssfully
+        else{
+
+            return response()->json( [
+                'error' => 'An error occured. Could not sign you in.'
+            ] , 401);
+
+        }
         
 
     }

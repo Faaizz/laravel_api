@@ -1203,7 +1203,7 @@ class ProductController extends Controller
          //\Utility\SimulateLogin::admin();
 
          //Admin Authorization required
-         $admin_test= new \Utility\AuthorizeAdmin();
+         $admin_test= new \Utility\AuthorizeAdmin($request);
  
          //Check if an Admin is logged in
          if($admin_test->fails()){
