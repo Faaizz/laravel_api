@@ -1,0 +1,10 @@
+default:
+    suites:
+        default:
+            paths:
+                - '%paths.base%/features'
+            contexts:
+                - ProductContext
+                #- OrderContext
+                #- StaffContext
+                #- CustomerContext

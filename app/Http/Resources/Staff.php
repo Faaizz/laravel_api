@@ -22,7 +22,6 @@ class Staff extends JsonResource
             'last_name' => $this->last_name,
             'email' => $this->email,
             'api_token' => $this->api_token,
-            'api_token' => $this->api_token,
             'address' => $this->address,
             'gender' => $this->gender,
             'phone_numbers' => $this->phone_numbers,
@@ -35,10 +34,7 @@ class Staff extends JsonResource
                                                 [
                                                     'staff_email' => $this->email,
                                                     'status' => 'pending'
-                                                ])->count(),
-
-            //Assigned Orders
-            'orders' => new OrderCollection($this->orders)
+                                                ])->count()
 
         ];
     }

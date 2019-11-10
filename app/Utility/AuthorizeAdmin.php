@@ -17,14 +17,14 @@ class AuthorizeAdmin extends AuthenticateStaff{
         parent::__construct();
 
         //If staff is logged in
-        if( $valid_staff ){
+        if( $this->valid_staff ){
 
             //Check if she's admin
             $staff= Auth::guard('staffs')->user();
 
             //If yes, set $valid_admin to true
             if( $staff->isAdmin() ){
-                $valid_admin= true;
+                $this->valid_admin= true;
             }
         }
         
@@ -33,7 +33,7 @@ class AuthorizeAdmin extends AuthenticateStaff{
     public function fails(){
 
         //If no staff is logged in or Staff is not admin, return true
-        if( !$valid_staff || !$valid_admin ){
+        if( !$this->valid_staff || !$this->valid_admin ){
             return true;
         }
         //Otherwise, return false
@@ -46,8 +46,8 @@ class AuthorizeAdmin extends AuthenticateStaff{
     public function errors(){
 
         //If no staff is logged in, call parent errors() method
-        if( !$valid_staff ){
-            parent::errors();
+        if( !$this->valid_staff ){
+            return parent::errors();
         }
 
         //If a staff is loggedin but is not admin

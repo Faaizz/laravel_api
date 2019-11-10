@@ -174,7 +174,8 @@ class StaffController extends Controller
                                     'address' => 'string',
                                     'gender' => 'string',
                                     'phone_numbers' => 'array["string"]',
-                                    'privilege_level' => 'string'
+                                    'privilege_level' => 'string',
+                                    'pending_orders' => 'integer'
                                 ]
                             ],
                             "links" => [
@@ -317,7 +318,8 @@ class StaffController extends Controller
                                     'address' => 'string',
                                     'gender' => 'string',
                                     'phone_numbers' => 'array["string"]',
-                                    'privilege_level' => 'string'
+                                    'privilege_level' => 'string',
+                                    'pending_orders' => 'integer'
                                 ]
                             ],
                             "links" => [
@@ -730,31 +732,21 @@ class StaffController extends Controller
         if($request->per_page){
             $per_page= \intval($request->per_page);
         }
-        
-        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
 
         //Simulate Admin login
-        $this->simulateAdminLogin();
+        \Utility\SimulateLogin::admin();
 
-        //Check staff login. Return an error is no staff is authenticated
-        if(!Auth::guard('staffs')->check()){
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin();
 
-            return response()->json( [
-                'error' => 'Please login as a staff.'
-            ], 401);
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
 
-        }
-
-        //Check if staff is Admin.
-        $staff= Auth::guard('staffs')->user();
-
-        if( !($staff->isAdmin()) ){
-           
-            return response()->json( [
-                'error' => 'Admin privilege required.'
-            ], 401);
+            return $admin_test->errors();
 
         }
+
+        //SUCCESS Admin Authorization
         
         //Return a collection of all staff through the StaffCollection Resource
         return  new StaffCollection(Staff::paginate($per_page));
@@ -774,27 +766,19 @@ class StaffController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         
         //Simulate Admin login
-        $this->simulateAdminLogin();
+        \Utility\SimulateLogin::admin();
 
-        //Check staff login. Return an error is no staff is authenticated
-        if(!Auth::guard('staffs')->check()){
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin();
 
-            return response()->json( [
-                'error' => 'Please login as a staff.'
-            ], 401);
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
 
-        }
-
-        //Check if staff is Admin.
-        $staff= Auth::guard('staffs')->user();
-
-        if( !($staff->isAdmin()) ){
-           
-            return response()->json( [
-                'error' => 'Admin privilege required.'
-            ], 401);
+            return $admin_test->errors();
 
         }
+
+        //SUCCESS Admin Authorization
 
         $staff= Staff::find($email);
 
@@ -820,17 +804,20 @@ class StaffController extends Controller
     public function self(){
 
         //===============TO-DO: REMOVE THIS!!!!====================
-        //Login Simulation
-        $this->simulateStaffLogin();
-        
-        //Check staff login. Return an error is no staff is authenticated
-        if(!Auth::guard('staffs')->check()){
+        //Simulate Admin login
+        \Utility\SimulateLogin::staff();
 
-            return response()->json( [
-                'error' => 'Please login as a staff.'
-            ], 401);
+        //Admin Authorization required
+        $staff_test= new \Utility\AuthenticateStaff();
+
+        //Check if an Admin is logged in
+        if($staff_test->fails()){
+
+            return $staff_test->errors();
 
         }
+
+        //SUCCESS Staff Authorization
 
         //Return Staff Data through the Staff Resource
         return new StaffResource( Auth::guard('staffs')->user() );
@@ -863,27 +850,20 @@ class StaffController extends Controller
          /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         
         //Simulate Admin login
-        $this->simulateAdminLogin();
+        \Utility\SimulateLogin::admin();
 
-        //Check staff login. Return an error is no staff is authenticated
-        if(!Auth::guard('staffs')->check()){
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin();
 
-            return response()->json( [
-                'error' => 'Please login as a staff.'
-            ], 401);
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
 
-        }
-
-        //Check if staff is Admin.
-        $staff= Auth::guard('staffs')->user();
-
-        if( !($staff->isAdmin()) ){
-           
-            return response()->json( [
-                'error' => 'Admin privilege required.'
-            ], 401);
+            return $admin_test->errors();
 
         }
+
+
+        //SUCCESS Admin Authorization
 
         //VALIDATE SEARCH DATA
         $rules= [
@@ -958,27 +938,20 @@ class StaffController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         
         //Simulate Admin login
-        $this->simulateAdminLogin();
+        \Utility\SimulateLogin::admin();
 
-        //Check staff login. Return an error is no staff is authenticated
-        if(!Auth::guard('staffs')->check()){
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin();
 
-            return response()->json( [
-                'error' => 'Please login as a staff.'
-            ], 401);
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
 
-        }
-
-        //Check if staff is Admin.
-        $staff= Auth::guard('staffs')->user();
-
-        if( !($staff->isAdmin()) ){
-           
-            return response()->json( [
-                'error' => 'Admin privilege required.'
-            ], 401);
+            return $admin_test->errors();
 
         }
+
+
+        //SUCCESS Admin Authorization
 
         //VALIDATION
         $rules= [
@@ -1082,16 +1055,16 @@ class StaffController extends Controller
     {
 
         //===============TO-DO: REMOVE THIS!!!!====================
-        //Login Simulation
-        $this->simulateStaffLogin();
-        //========================================================
+        //Simulate Admin login
+        \Utility\SimulateLogin::staff();
 
-        //If the current user is not authenticated
-        if(!Auth::guard('staffs')->check()){
+        //Staff Authorization required
+        $staff_test= new \Utility\AuthorizeAdmin();
 
-            return response()->json( [
-                'error' => 'Please login.'
-            ], 401);
+        //Check if an Admin is logged in
+        if($staff_test->fails()){
+
+            return $staff_test->errors();
 
         }
 
@@ -1185,7 +1158,21 @@ class StaffController extends Controller
      */
     public function delete($email){
 
-        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
+        //Simulate Admin login
+        \Utility\SimulateLogin::admin();
+
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin();
+
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
+
+            return $admin_test->errors();
+
+        }
+
+
+        //SUCCESS Admin Authorization
 
         //Check if Staff exisits
         $staff= Staff::find($email);
@@ -1214,35 +1201,6 @@ class StaffController extends Controller
         $staff->delete();
 
         return response()->json( [],204);
-    }
-
-
-
-
-    /* ============================================================ */
-    /*  U   T   I   L   I   T   Y       F   U   N   C   T   I   O   N   S */
-
-
-    /**
-     * Simulate Staff Login
-     */
-    protected function simulateStaffLogin(){
-
-        //Login the first staff
-        $staff= Staff::all()->last();
-        Auth::guard('staffs')->login($staff);
-
-    }
-
-    /**
-     * Simulate Admin Login
-     */
-    protected function simulateAdminLogin(){
-
-        //Login the first admin
-        $admin= Staff::where("privilege_level", "admin")->first();
-        Auth::guard('staffs')->login($admin);
-
     }
 
 

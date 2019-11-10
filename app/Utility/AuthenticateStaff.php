@@ -16,7 +16,7 @@ class AuthenticateStaff{
         //If a staff is signed in
         if( Auth::guard('staffs')->check() ){
 
-            $valid_staff= true;
+            $this->valid_staff= true;
 
         }
 
@@ -25,7 +25,7 @@ class AuthenticateStaff{
     public function fails(){
 
         //If no valid staff is logged in
-        if(!$valid_staff){
+        if(!$this->valid_staff){
 
             return true;
 
@@ -41,7 +41,7 @@ class AuthenticateStaff{
 
         //Return a Response with authentication Error
         return response()->json( [
-            "failed_authentication" => "Please login." 
+            "failed_authentication" => "Please login as a staff." 
         ], 401);
 
     }

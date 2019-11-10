@@ -47,7 +47,7 @@ Route::options('/products', 'ProductController@options');
 /* R   E   A   D */
 
 //ALL PRODUCTS
-Route::get('/products/{section?}/{sub_section?}/{category?}', 'ProductController@index')
+Route::middleware('auth:api')->get('/products/{section?}/{sub_section?}/{category?}', 'ProductController@index')
         ->where([
             'section' => '[A-Za-z]+',
             'sub_section' => '[A-Za-z]+',
@@ -55,7 +55,7 @@ Route::get('/products/{section?}/{sub_section?}/{category?}', 'ProductController
         ]);
 
 //NEW IN
-Route::get('/products/new_in/{weeeks?}/{section?}/{sub_section?}/{category?}', 'ProductController@new')
+Route::middleware('auth:api')->get('/products/new_in/{weeeks?}/{section?}/{sub_section?}/{category?}', 'ProductController@new')
         ->where([
             'weeks' => '[0-9]+',
             'section' => '[A-Za-z]+',
@@ -65,10 +65,10 @@ Route::get('/products/new_in/{weeeks?}/{section?}/{sub_section?}/{category?}', '
 
 //PRODUCT SEARCH
  //Method set as ANY so that pagination works well
-Route::any('/products/search', 'ProductController@search');
+Route::middleware('auth:api')->any('/products/search', 'ProductController@search');
 
 //SINGLE PRODUCT SELECT
-Route::get('/products/{id}', 'ProductController@show');
+Route::middleware('auth:api')->get('/products/{id}', 'ProductController@show');
 
 
 /* C    R   E   A   T   E */

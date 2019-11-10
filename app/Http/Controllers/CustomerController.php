@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-use Utility\SimulateLogin;
-
 //RESOURCES
 use App\Http\Resources\Customer as CustomerResource;
 use App\Http\Resources\CustomerCollection;
@@ -698,7 +696,7 @@ class CustomerController extends Controller
      */
     public function logout(){
 
-        SimulateLogin::customer();
+        \Utility\SimulateLogin::customer();
 
         //If no user is logged in, return an error reponse
         if ( !Auth::guard('web')->check() ){
@@ -757,7 +755,7 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        SimulateLogin::staff();
+        \Utility\SimulateLogin::staff();
         //========================================================
 
 
@@ -770,15 +768,17 @@ class CustomerController extends Controller
         }
 
         
-        //If no staff is not authenticated
-        if(!Auth::guard('staffs')->check()){
+        //Authenticate staff
+        $staff_test= new \Utility\AuthenticateStaff();
 
-            return response()->json( [
-                'error' => 'Please login as a staff.'
-            ], 401);
-
+        //Failed Authentication
+        if($staff_test->fails()){
+            //Return an error
+            return $staff_test->errors();
         }
-
+        
+        //SUCCESS Authentication
+        
         //Return all Customers through the Customer Resource and paginate
         return new CustomerCollection(Customer::paginate($per_page));
 
@@ -797,19 +797,20 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        SimulateLogin::staff();
+        \Utility\SimulateLogin::staff();
         //========================================================
 
 
         
-        //If no staff is not authenticated
-        if(!Auth::guard('staffs')->check()){
+        //Authenticate staff
+        $staff_test= new \Utility\AuthenticateStaff();
 
-            return response()->json( [
-                'error' => 'Please login as a staff.'
-            ], 401);
-
+        //Failed Authentication
+        if($staff_test->fails()){
+            //Return an error
+            return $staff_test->errors();
         }
+        
         
         $customer= Customer::find($email);
 
@@ -853,15 +854,15 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
 
        //Simulate Admin login
-       SimulateLogin::staff();
+       \Utility\SimulateLogin::staff();
 
-       //Check staff login. Return an error is no staff is authenticated
-       if(!Auth::guard('staffs')->check()){
+       //Authenticate staff
+       $staff_test= new \Utility\AuthenticateStaff();
 
-           return response()->json( [
-               'error' => 'Please login as a staff.'
-           ], 401);
-
+       //Failed Authentication
+       if($staff_test->fails()){
+           //Return an error
+           return $staff_test->errors();
        }
 
 
@@ -911,8 +912,8 @@ class CustomerController extends Controller
        }
 
        
-       //FIND MATCHED STAFF AND PAGINATE MATCHES
-       $staff= Staff::where('email', 'like', '%'. $email . '%')
+       //FIND MATCHED CUSTOMER AND PAGINATE MATCHES
+       $customers= Customer::where('email', 'like', '%'. $email . '%')
                    ->where('first_name', 'like', '%' . $first_name . '%')
                    ->where('last_name', 'like', '%' . $last_name . '%')
                    ->where('address', 'like', '%' . $address . '%')
@@ -921,14 +922,14 @@ class CustomerController extends Controller
 
 
        //if no result is found
-       if(count($staff) == 0){
+       if(count($customers) == 0){
            return response()->json([
                'error' => 'no matches found',
                'search_params' => $request->all()
            ], 404);
        }
 
-       return new CustomerCollection($staff);
+       return new CustomerCollection($customers);
    }
 
 
@@ -943,7 +944,7 @@ class CustomerController extends Controller
         
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        SimulateLogin::customer();
+        \Utility\SimulateLogin::customer();
         //========================================================
         
         //If the current user is not authenticated
@@ -1088,7 +1089,7 @@ class CustomerController extends Controller
 
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        SimulateLogin::customer();
+        \Utility\SimulateLogin::customer();
         //========================================================
 
         //If the current user is not authenticated
@@ -1194,19 +1195,21 @@ class CustomerController extends Controller
         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         //===============TO-DO: REMOVE THIS!!!!====================
         //Login Simulation
-        SimulateLogin::staff();
+        \Utility\SimulateLogin::staff();
         //========================================================
 
         
-        //If no staff is not authenticated
-        if(!Auth::guard('staffs')->check()){
+       //Authenticate staff
+       $staff_test= new \Utility\AuthenticateStaff();
 
-            return response()->json( [
-                'error' => 'Please login as a staff.'
-            ], 401);
+       //Failed Authentication
+       if($staff_test->fails()){
+           //Return an error
+           return $staff_test->errors();
+       }
+       
 
-        }
-
+       //SUCCESS Authentication
 
         //Check if Customer exisits
         $customer= Customer::find($email);
@@ -1237,32 +1240,5 @@ class CustomerController extends Controller
         return response()->json( [],204);
     }
 
-
-
-    /* ============================================================ */
-    /*  U   T   I   L   I   T   Y       F   U   N   C   T   I   O   N   S */
-
-
-    /**
-     * Simulate Customer Login
-     */
-    protected function simulateCustomerLogin(){
-
-        //Login the last customer
-        $customer= customer::all()->last();
-        Auth::guard('web')->login($customer);
-
-    }
-
-    /**
-     * Simulate Staff Login
-     */
-    protected function simulateStaffLogin(){
-
-        //Login the last Staff
-        $staff= Staff::all()->last();
-        Auth::guard('staffs')->login($staff);
-
-    }
 
 }

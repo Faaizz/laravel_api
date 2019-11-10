@@ -1,8 +1,5 @@
-{
-    "main_image": "/path/to/main/image-file-name.extension",
-    "other_images":[
-        "/path/to/additional/image-one.extension",
-        "/path/to/additional/image-three.extension",
-        "/path/to/additional/image-two.extension"
-    ]
-}
+[
+    "/path/to/main/image-one.extension",
+    "/path/to/additional/image-three.extension",
+    "/path/to/additional/image-two.extension"
+]

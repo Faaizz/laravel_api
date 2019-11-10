@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
-use Utility\SimulateLogin;
-
 
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\Product as ProductResource;
@@ -160,7 +158,7 @@ class ProductController extends Controller
                             ],
                             'per_page' => [
                                 'required' => false,
-                                'description' => 'number of products to display per page',
+                                'description' => 'number of products to display per page. (default= 20)',
                                 'type' => 'integer'
                             ]
                         ],
@@ -247,7 +245,7 @@ class ProductController extends Controller
                             ],
                             'per_page' => [
                                 'required' => false,
-                                'description' => 'number of products to return per page',
+                                'description' => 'number of products to return per page (default = 20)',
                                 'type' => 'integer'
                             ]
                         ],
@@ -256,7 +254,7 @@ class ProductController extends Controller
 
                             'weeks' => [
                                 'required' => false,
-                                'description' => 'number of weeks to go back from the current date',
+                                'description' => 'number of weeks to go back from the current date (default = 3)',
                                 'type' => 'integer'
                             ],
 
@@ -387,7 +385,7 @@ class ProductController extends Controller
                             ],
                             'per_page' => [
                                 'required' => false,
-                                'description' => 'number of products to return per page',
+                                'description' => 'number of products to return per page (default = 20)',
                                 'type' => 'integer'
                             ]
                         ],
@@ -521,7 +519,7 @@ class ProductController extends Controller
                             ],
                             'per_page' => [
                                 'required' => false,
-                                'description' => 'number of products to return per page',
+                                'description' => 'number of products to return per page (default = 20)',
                                 'type' => 'integer'
                             ]
                         ],
@@ -582,7 +580,7 @@ class ProductController extends Controller
                                 'type' => 'string'
                             ],
 
-                            'size_and_quantity' => [
+                            'options' => [
                                 'required' => true,
                                 'description' => 'Array of product sizes and corresponding qunatity of each',
                                 'type' => 'array: array[
@@ -911,6 +909,11 @@ class ProductController extends Controller
             $per_page= \intval($request->per_page);
         }
 
+        //Trim Route Parameter strings
+        $section= trim($section);
+        $sub_section= trim($sub_section);
+        $category= trim($category);
+
         $products= null;
 
         if($section){
@@ -958,8 +961,6 @@ class ProductController extends Controller
      * @return JSON JSON formatted response
      */
     public function new(Request $request, $weeks=3, $section=null, $sub_section=null, $category=null){
-
-        /* =================IMPLEMENT: ADMIN AUTHORIZATION REQUIRED======================== */
 
         //Set default per_page value for pagination
         $per_page= 20;
@@ -1157,7 +1158,17 @@ class ProductController extends Controller
         if(count($products) == 0){
             return response()->json([
                 'error' => 'no matches found',
-                'search_params' => $category_array
+                'search_params' => $category_array,
+                'meta' => [
+                        'current_page' => 0,
+                        'from' => 0,
+                        'last_page' => 0,
+                        'path' => $request->url(),
+                        'per_page' => 0,
+                        'to' => 0,
+                        'total' => 0
+            ]
+
             ], 404);
         }
 
@@ -1178,7 +1189,7 @@ class ProductController extends Controller
      * @param string $request->color
      * @param double $request->price
      * @param string $request->material
-     * @param array $request->size_and_quantity
+     * @param array $request->options
      * @param image $request->image_one  
      * @param image $request->image_two 
      * @param image $request->image_three
@@ -1188,31 +1199,20 @@ class ProductController extends Controller
      */
     public function store(Request $request){
 
-        /* ========SIMULATE admin LOGIN========== */
-        SimulateLogin::admin();
+         /* ========SIMULATE admin LOGIN========== */
+         //\Utility\SimulateLogin::admin();
 
-
-        //Validate Authentication
-        //If no staff is signed in
-        if( !Auth::guard('staffs')->check() ){
-
-            return response()->json( [
-                "failed_authentication" => "Please login." 
-            ], 401);
-
-        }
-
-        //If staff is logged in, check if she's admin
-        $staff= Auth::guard('staffs')->user();
-        //If no
-        if( !$staff->isAdmin() ){
-
-            return response()->json( [
-                "failed_authorization" => "Please login as admin." 
-            ], 401);
-
-        }
-        
+         //Admin Authorization required
+         $admin_test= new \Utility\AuthorizeAdmin();
+ 
+         //Check if an Admin is logged in
+         if($admin_test->fails()){
+ 
+             return $admin_test->errors();
+ 
+         }
+ 
+         //SUCCESS Admin Authorization
         
 
         //VALIDATION
@@ -1223,10 +1223,10 @@ class ProductController extends Controller
             'section' => 'required|max:100|string',
             'sub_section' => 'required|max:50|string',
             'category' => 'required|max:50|string',
-            'price' => 'required|numeric',
+            'price' => 'required|max:50|string',
             'color' => 'required|max:50|string',
             'material' => 'required|max:50|string',
-            'size_and_quantity' => 'required|JSON',
+            'options' => 'required|JSON',
             'image_one' => 'required|mimes:jpeg,gif,png',
             'image_two' => 'required|mimes:jpeg,gif,png',
             'image_three' => 'required|mimes:jpeg,gif,png',
@@ -1242,38 +1242,38 @@ class ProductController extends Controller
 
         //SUCCESS VALDATION
 
-        //Validate "size_and_quantity" JSON array
-        $size_and_quantity= \json_decode($request->get('size_and_quantity'));
-        $valid_size_and_quantity= false;
+        //Validate "options" JSON array
+        $options= \json_decode($request->get('options'));
+        $valid_options= false;
 
-        foreach($size_and_quantity as $a_s_and_q){
+        foreach($options as $option){
             //check size string
-            if( !isset($a_s_and_q->size) | !isset($a_s_and_q->quantity) ){
+            if( !isset($option->size) | !isset($option->quantity) ){
                 //if 'size' OR 'quantity' attribute does not exist, set validity to false and exit loop
-                $valid_size_and_quantity= false;
+                $valid_options= false;
                 break;
             }
 
             //if 'quanity' is a valid integer
-            if ( filter_var($a_s_and_q->size, FILTER_SANITIZE_STRING) 
+            if ( filter_var($option->size, FILTER_SANITIZE_STRING) 
                     &&
-                filter_var($a_s_and_q->quantity, FILTER_VALIDATE_INT) 
+                filter_var($option->quantity, FILTER_VALIDATE_INT) 
             )
-            $valid_size_and_quantity= true;
+            $valid_options= true;
 
         }
 
 
-        //CHECK FOR 'size_and_quantity' VALIDATION
-        if(!$valid_size_and_quantity){
+        //CHECK FOR 'options' VALIDATION
+        if(!$valid_options){
             return response()->json( [
-                'size_and_quantity' => 'A valid JSON array of objects with "size" and "quantity fileds is required"'
+                'options' => 'A valid JSON array of objects with "size" and "quantity fileds is required"'
             ] ,401);
         }
 
         //IF VALID
-        if($valid_size_and_quantity){
-            $size_and_quantity= \json_encode($size_and_quantity);
+        if($valid_options){
+            $options= \json_encode($options);
         }
 
         //GET PRODUCT IMAGES
@@ -1296,7 +1296,7 @@ class ProductController extends Controller
         $new_product->color= $request->get('color');
         $new_product->price= doubleval($request->get('price'));
         $new_product->material= $request->get('material');
-        $new_product->size_and_quantity= $size_and_quantity;
+        $new_product->options= $options;
         $new_product->images= json_encode($images);
 
         $new_product->save();    
@@ -1334,32 +1334,20 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id){
 
-        /* ========SIMULATE admin LOGIN========== */
-        SimulateLogin::admin();
+         /* ========SIMULATE admin LOGIN========== */
+         \Utility\SimulateLogin::admin();
 
-
-        //Validate Authentication
-        //If no staff is signed in
-        if( !Auth::guard('staffs')->check() ){
-
-            return response()->json( [
-                "failed_authentication" => "Please login." 
-            ], 401);
-
-        }
-
-        //If staff is logged in, check if she's admin
-        $staff= Auth::guard('staffs')->user();
-        //If no
-        if( !$staff->isAdmin() ){
-
-            return response()->json( [
-                "failed_authorization" => "Please login as admin." 
-            ], 401);
-
-        }
-
-
+         //Admin Authorization required
+         $admin_test= new \Utility\AuthorizeAdmin();
+ 
+         //Check if an Admin is logged in
+         if($admin_test->fails()){
+ 
+             return $admin_test->errors();
+ 
+         }
+ 
+         //SUCCESS Admin Authorization
 
         //VALIDATION
         $rules= [
@@ -1370,7 +1358,7 @@ class ProductController extends Controller
             'section' => 'max:100|string',
             'sub_section' => 'max:50|string',
             'category' => 'max:50|string',
-            'price' => 'numeric',
+            'price' => 'max:50|string',
             'color' => 'max:50|string',
             'material' => 'max:50|string',
             'size_and_quantity' => 'JSON',
@@ -1567,32 +1555,20 @@ class ProductController extends Controller
      */
     public function delete($id){
 
-        /* ========SIMULATE admin LOGIN========== */
-        SimulateLogin::admin();
+         /* ========SIMULATE admin LOGIN========== */
+         \Utility\SimulateLogin::admin();
 
-
-        //Validate Authentication
-        //If no staff is signed in
-        if( !Auth::guard('staffs')->check() ){
-
-            return response()->json( [
-                "failed_authentication" => "Please login." 
-            ], 401);
-
-        }
-
-        //If staff is logged in, check if she's admin
-        $staff= Auth::guard('staffs')->user();
-        //If no
-        if( !$staff->isAdmin() ){
-
-            return response()->json( [
-                "failed_authorization" => "Please login as admin." 
-            ], 401);
-
-        }
-
-
+         //Admin Authorization required
+         $admin_test= new \Utility\AuthorizeAdmin();
+ 
+         //Check if an Admin is logged in
+         if($admin_test->fails()){
+ 
+             return $admin_test->errors();
+ 
+         }
+ 
+         //SUCCESS Admin Authorization
 
         //Pull product to delete
         $product= Product::find($id);
@@ -1631,32 +1607,20 @@ class ProductController extends Controller
      */
     public function massDelete(Request $request){
 
-        /* ========SIMULATE admin LOGIN========== */
-        SimulateLogin::admin();
+         /* ========SIMULATE admin LOGIN========== */
+         \Utility\SimulateLogin::admin();
 
-
-        //Validate Authentication
-        //If no staff is signed in
-        if( !Auth::guard('staffs')->check() ){
-
-            return response()->json( [
-                "failed_authentication" => "Please login." 
-            ], 401);
-
-        }
-
-        //If staff is logged in, check if she's admin
-        $staff= Auth::guard('staffs')->user();
-        //If no
-        if( !$staff->isAdmin() ){
-
-            return response()->json( [
-                "failed_authorization" => "Please login as admin." 
-            ], 401);
-
-        }
-
-
+         //Admin Authorization required
+         $admin_test= new \Utility\AuthorizeAdmin();
+ 
+         //Check if an Admin is logged in
+         if($admin_test->fails()){
+ 
+             return $admin_test->errors();
+ 
+         }
+ 
+         //SUCCESS Admin Authorization
 
         //VALIDATION
         $rules= [

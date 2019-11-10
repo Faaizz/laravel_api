@@ -9,9 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
-use Utility\SimulateLogin;
-use Utility\AuthorizeAdmin;
-
 class SettingController extends Controller
 {
 
@@ -187,7 +184,9 @@ class SettingController extends Controller
                                 'required' => true,
                                 'description' => 'Setting name',
                                 'type' => 'string'
-                            ],
+                            ]
+                        ],
+                        'POST' => [
                             'content' => [
                                 'required' => true,
                                 'description' => 'Setting content',
@@ -261,10 +260,10 @@ class SettingController extends Controller
     public function index(){
 
         /**========SIMULATE ADMIN LOGIN=========== */
-        SimulateLogin::admin();
+        \Utility\SimulateLogin::admin();
 
         //Admin Authorization Required
-        $admin_test= new AuthorizeAdmin();
+        $admin_test= new \Utility\AuthorizeAdmin();
 
         //If Authorization fails
         if($admin_test->fails()){
@@ -298,26 +297,16 @@ class SettingController extends Controller
     public function show($name){
 
         /**========SIMULATE ADMIN LOGIN=========== */
-        SimulateLogin::admin();
+        \Utility\SimulateLogin::admin();
 
-        //Validate Authentication
-        //If no staff is signed in
-        if( !Auth::guard('staffs')->check() ){
+        //Admin Authorization Required
+        $admin_test= new \Utility\AuthorizeAdmin();
 
-            return response()->json( [
-                "failed_authentication" => "Please login." 
-            ], 401);
+        //If Authorization fails
+        if($admin_test->fails()){
 
-        }
-
-        //If staff is logged in, check if she's admin
-        $staff= Auth::guard('staffs')->user();
-        //If no
-        if( !$staff->isAdmin() ){
-
-            return response()->json( [
-                "failed_authorization" => "Please login as admin." 
-            ], 401);
+            //Return errors
+            return $admin_test->errors();
 
         }
 
@@ -357,26 +346,16 @@ class SettingController extends Controller
     public function store(Request $request){
 
         /**========SIMULATE ADMIN LOGIN=========== */
-        SimulateLogin::admin();
+        \Utility\SimulateLogin::admin();
 
-        //Validate Authentication
-        //If no staff is signed in
-        if( !Auth::guard('staffs')->check() ){
+        //Admin Authorization Required
+        $admin_test= new \Utility\AuthorizeAdmin();
 
-            return response()->json( [
-                "failed_authentication" => "Please login." 
-            ], 401);
+        //If Authorization fails
+        if($admin_test->fails()){
 
-        }
-
-        //If staff is logged in, check if she's admin
-        $staff= Auth::guard('staffs')->user();
-        //If no
-        if( !$staff->isAdmin() ){
-
-            return response()->json( [
-                "failed_authorization" => "Please login as admin." 
-            ], 401);
+            //Return errors
+            return $admin_test->errors();
 
         }
 
@@ -400,27 +379,39 @@ class SettingController extends Controller
         }
 
         //SUCCESS VALIDATION
+        $request->name= trim($request->name);
+        
+        //Check if a setting with the same name already exists
+        $exists= Setting::find($request->name);
+
+        //If setting wuth same name already exists, return an error
+        if($exists){
+
+            return response()->json( [
+                'error' => 'Error. Setting with name: ' . $request->name . ' already exists.'
+            ] ,401);
+        }
+
         $setting= new Setting();
 
-        $setting->name= trim($request->name);
+        $setting->name= $request->name;
         $setting->content= $request->content;
 
         //Save to Database
         $setting->save();
 
-        //Verify Save
-        $saved_setting= Setting::find($setting->name);
-
-        //If not found
-        if( !$saved_setting ){
+        //Verify Save, check if "created_at" field has been added to the Setting instance
+        //If not, save failed
+        if( !$setting->created_at ){
 
             return response()->json( [
                 'error' => 'An unexpected error occurred. Could not save setting to database.'
             ] ,500);
+
         }
 
         //SUCCESS
-        return response()->json( [], 201);
+        return response()->json( $setting, 200);
 
 
     }
@@ -430,18 +421,33 @@ class SettingController extends Controller
 
     /**
      * Update the contents of an existing setting
+     * 
+     * @param $name Route parameter. Name of setitng to edit
+     * @param $request->content new content to put
+     * 
+     * @return JSON JSON formattted Response
      */
-    public function update(Requeest $request){
+    public function update(Request $request, $name){
 
-        /* =======SIMULATE LOGIN======= */
-        SimulateLogin::admin();
+        /**========SIMULATE ADMIN LOGIN=========== */
+        \Utility\SimulateLogin::admin();
+
+        //Admin Authorization Required
+        $admin_test= new \Utility\AuthorizeAdmin();
+
+        //If Authorization fails
+        if($admin_test->fails()){
+
+            //Return errors
+            return $admin_test->errors();
+
+        }
 
 
         //SUCCESS Authentication and Authorization
 
         //VALIDATION
         $rules= [
-            'name' => 'required|max:100|string',
             'content' => 'required|JSON'
         ];
 
@@ -458,13 +464,13 @@ class SettingController extends Controller
         //SUCCESS Validation
         
         //Check if setitng exists
-        $setting= Setting::find(trim($request->name));
+        $setting= Setting::find(trim($name));
 
         //If setting doesn't exist
         if( !$setting ){
 
             return response()->json(  [
-                'error' => 'Error! Setting with the name ' . $request->name . ' does not exist.'
+                'error' => 'Error! Setting with the name ' . $name . ' does not exist.'
             ] ,404);
 
         }
@@ -493,7 +499,47 @@ class SettingController extends Controller
      */
     public function delete($name){
 
+        /**========SIMULATE ADMIN LOGIN=========== */
+        \Utility\SimulateLogin::admin();
 
+        //Admin Authorization Required
+        $admin_test= new \Utility\AuthorizeAdmin();
+
+        //If Authorization fails
+        if($admin_test->fails()){
+
+            //Return errors
+            return $admin_test->errors();
+
+        }
+
+        //SUCCESS Authentication and Authorization
+        //Check if setitng exists
+        $setting= Setting::find(trim($name));
+
+        //If setting doesn't exist
+        if( !$setting ){
+
+            return response()->json(  [
+                'error' => 'Error! Setting with the name ' . $name . ' does not exist.'
+            ] ,404);
+
+        }
+
+        //If setting is found, delete it
+        $setting->delete();
+
+        //Verify delete
+        if(Setting::find($name)){
+
+            return response()->json( [
+                'error' => 'An unexpected error occurred. Could not delete setting from database.'
+            ] ,500);
+
+        }
+
+        //SUCCESS
+        return response()->json([], 204);
 
     }
 

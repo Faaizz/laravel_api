@@ -11,8 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
-use Utility\SimulateLogin;
-
 //RESOURCES
 use App\Http\Resources\OrderCollection;
 use App\Http\Resources\Order as OrderResource;
@@ -868,38 +866,25 @@ class OrderController extends Controller
     public function ordersByStatus($per_page, $status){
 
         /* ======SIMULATE ADMIN LOGIN======== */
-        SimulateLogin::admin();
+        \Utility\SimulateLogin::admin();
 
 
         //CHECK IF NUMBER OF ORDERS PER PAGE IS SET, OTHERWISE DEFAULT TO 20
         $per_page= intval($per_page) ?: 20 ;
 
                 
-        //AUTHENTICATE ADMIN
+        //Simulate Admin login
+        \Utility\SimulateLogin::admin();
 
-        //Check if staff is logged in
-        $staff_logged_in= Auth::guard('staffs')->check();
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin();
 
-        if( !$staff_logged_in ){
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
 
-            //Return a failed_authentication response
-            return response()->json( [
-                'failed_authentication' => 'Please log in'
-            ], 401);
+            return $admin_test->errors();
 
         }
-
-        //Check if logged in staff is admin
-        $staff_is_admin= Auth::guard('staffs')->user()->isAdmin();
-
-        if( !$staff_is_admin ){
-
-            //Return a failed_authorization response
-            return response()->json( [
-                'failed_authorization' => 'Please log in ad admin'
-            ], 401);
-        }
-
 
         //SUCCESS: AUTHENTICATION AND AUTHORIZATION
    
@@ -987,28 +972,16 @@ class OrderController extends Controller
         //STAFF
         if( $role == 'staff' ){
 
-            if( !$staff_logged_in ){
+            //Simulate Admin login
+            \Utility\SimulateLogin::admin();
 
-                //Return a failed_authentication response
-                return response()->json( [
-                    'failed_authentication' => 'Please log in'
-                ], 401);
+            //Admin Authorization required
+            $admin_test= new \Utility\AuthorizeAdmin();
 
-            }
+            //Check if an Admin is logged in
+            if($admin_test->fails()){
 
-            //If staff is not admin
-            if( !$staff_is_admin ){
-
-                $staff_is_authorized= trim($staff->email) == trim($email);
-
-                if( !$staff_is_authorized ){
-
-                    //Return a failed_authentication response
-                    return response()->json( [
-                        'failed_authorization' => 'Please log in as an authorized staff'
-                    ], 401);
-
-                }
+                return $admin_test->errors();
 
             }
 
@@ -1097,6 +1070,21 @@ class OrderController extends Controller
      */
     public function index(Request $request){
 
+        //Simulate Admin login
+        \Utility\SimulateLogin::admin();
+
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin();
+
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
+
+            return $admin_test->errors();
+
+        }
+
+        //SUCCESS Admin Authorization
+
         //CHECK IF NUMBER OF ORDERS PER PAGE IS SET, OTHERWISE DEFAULT TO 20
         $per_page= intval($request->per_page) ?: 20 ;
 
@@ -1171,8 +1159,8 @@ class OrderController extends Controller
     public function customer(Request $request, $email){
 
         /* ========SIMULATE CUSTOMER LOGIN========== */
-        SimulateLogin::customer();
-        //SimulateLogin::admin();
+        \Utility\SimulateLogin::customer();
+        //\Utility\SimulateLogin::admin();
 
         //Call ordersByEmail() utility function
         return $this->ordersByEmail($request->per_page, $email, 'customer', $request->status);
@@ -1198,7 +1186,7 @@ class OrderController extends Controller
     public function staff(Request $request, $email){
 
         /* ========SIMULATE staff LOGIN========== */
-        SimulateLogin::staff();
+        \Utility\SimulateLogin::staff();
 
         //Call ordersByEmail() utility function
         return $this->ordersByEmail($request->per_page, $email, 'staff', $request->status);
@@ -1227,30 +1215,19 @@ class OrderController extends Controller
         $per_page= intval($request->per_page) ?: 20;
 
         /* ========SIMULATE admin LOGIN========== */
-        SimulateLogin::admin();
+        \Utility\SimulateLogin::admin();
 
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin();
 
-        //Validate Authentication
-        //If no staff is signed in
-        if( !Auth::guard('staffs')->check() ){
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
 
-            return response()->json( [
-                "failed_authentication" => "Please login." 
-            ], 401);
-
-        }
-
-        //If staff is logged in, check if she's admin
-        $staff= Auth::guard('staffs')->user();
-        //If no
-        if( !$staff->isAdmin() ){
-
-            return response()->json( [
-                "failed_authorization" => "Please login as admin." 
-            ], 401);
+            return $admin_test->errors();
 
         }
 
+        //SUCCESS Admin Authorization
 
         //Validate status if status is set
         if ($request->status){
@@ -1305,7 +1282,7 @@ class OrderController extends Controller
     public function show($id){
 
         /* ========SIMULATE admin LOGIN========== */
-        SimulateLogin::admin();
+        \Utility\SimulateLogin::admin();
 
 
         //find order with specified id
@@ -1420,7 +1397,7 @@ class OrderController extends Controller
     public function store(Request $request){
 
         /* =======SIMULATE CUSTOMER LOGIN========= */
-        SimulateLogin::customer();
+        \Utility\SimulateLogin::customer();
 
         //Check customer authentication
         if ( !Auth::guard('web')->check() ){
@@ -1460,7 +1437,7 @@ class OrderController extends Controller
         }
 
         //If Product is found, check available quantity of the specified size
-        $size_and_quantity= json_decode($product->size_and_quantity);
+        $options= json_decode($product->options);
 
         $request->product_size= trim($request->product_size);
 
@@ -1468,15 +1445,15 @@ class OrderController extends Controller
         $valid_quantity= false;
 
         
-        foreach($size_and_quantity as $a_s_and_q){
+        foreach($options as $option){
 
             //If this is the selected size
-            if( !empty($a_s_and_q->size) && trim($a_s_and_q->size) == $request->product_size ){
+            if( !empty($option->size) && trim($option->size) == $request->product_size ){
 
                 $valid_size= true;
 
                 //Check available quantity
-                $available_quantity= intval($a_s_and_q->quantity);
+                $available_quantity= intval($option->quantity);
 
                 //Compare with Quantity specified in order
                 if( intval($request->product_quantity) <= $available_quantity ){
@@ -1556,7 +1533,7 @@ class OrderController extends Controller
 
 
         /* ========SIMULATE staff LOGIN========== */
-        SimulateLogin::staff();
+        \Utility\SimulateLogin::staff();
 
 
         //find order with specified id
@@ -1715,30 +1692,17 @@ class OrderController extends Controller
     public function delete($id){
 
         /* ========SIMULATE admin LOGIN========== */
-        SimulateLogin::admin();
+        \Utility\SimulateLogin::admin();
 
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin();
 
-        //Validate Authentication
-        //If no staff is signed in
-        if( !Auth::guard('staffs')->check() ){
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
 
-            return response()->json( [
-                "failed_authentication" => "Please login." 
-            ], 401);
-
-        }
-
-        //If staff is logged in, check if she's admin
-        $staff= Auth::guard('staffs')->user();
-        //If no
-        if( !$staff->isAdmin() ){
-
-            return response()->json( [
-                "failed_authorization" => "Please login as admin." 
-            ], 401);
+            return $admin_test->errors();
 
         }
-
 
         //SUCCESS AUTHENTICATION AND AUTHORIZATION
 
@@ -1788,30 +1752,17 @@ class OrderController extends Controller
     public function massDelete(Request $request){
 
         /* ========SIMULATE admin LOGIN========== */
-        SimulateLogin::admin();
+        \Utility\SimulateLogin::admin();
 
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin();
 
-        //Validate Authentication
-        //If no staff is signed in
-        if( !Auth::guard('staffs')->check() ){
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
 
-            return response()->json( [
-                "failed_authentication" => "Please login." 
-            ], 401);
-
-        }
-
-        //If staff is logged in, check if she's admin
-        $staff= Auth::guard('staffs')->user();
-        //If no
-        if( !$staff->isAdmin() ){
-
-            return response()->json( [
-                "failed_authorization" => "Please login as admin." 
-            ], 401);
+            return $admin_test->errors();
 
         }
-
 
         //SUCCESS AUTHENTICATION AND AUTHORIZATION
 
