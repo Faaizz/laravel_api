@@ -555,7 +555,7 @@ class StaffController extends Controller
         //Customer not found, redirect to /api/staff/login/manual
         if( empty($staff_login) || $staff_login->count() <= 0 ){
 
-            return redirect()->route('staff_manual_login');
+            return false;
 
         }
 
@@ -698,13 +698,16 @@ class StaffController extends Controller
      * 
      * @return JSON JSON formatted response
      */
-    public function logout(){
+    public function logout(Request $request){
 
         //If no user is logged in, return an error reponse
-        if ( !Auth::guard('staffs')->check() ){
+        $staff_test= new \Utility\AuthenticateStaff($request);
+
+        //Check if an Admin is logged in
+        if($staff_test->fails()){
 
             return response()->json([
-                'error' => 'no user is logged in'
+                "error" => "No user is logged in"
             ], 404);
 
         }
@@ -763,11 +766,8 @@ class StaffController extends Controller
             $per_page= \intval($request->per_page);
         }
 
-        //Simulate Admin login
-        \Utility\SimulateLogin::admin();
-
         //Admin Authorization required
-        $admin_test= new \Utility\AuthorizeAdmin();
+        $admin_test= new \Utility\AuthorizeAdmin($request);
 
         //Check if an Admin is logged in
         if($admin_test->fails()){
@@ -791,15 +791,11 @@ class StaffController extends Controller
      * 
      * @return JSON JSON formatted response
      */
-    public function show($email){
-
-        /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
+    public function show(Request $request, $email){
         
-        //Simulate Admin login
-        \Utility\SimulateLogin::admin();
-
+       
         //Admin Authorization required
-        $admin_test= new \Utility\AuthorizeAdmin();
+        $admin_test= new \Utility\AuthorizeAdmin($request);
 
         //Check if an Admin is logged in
         if($admin_test->fails()){
@@ -831,16 +827,12 @@ class StaffController extends Controller
      * 
      *  @return JSON JSON formatted response
      */
-    public function self(){
+    public function self(Request $request){
 
-        //===============TO-DO: REMOVE THIS!!!!====================
-        //Simulate Admin login
-        \Utility\SimulateLogin::staff();
+        //Staff Authorization required
+        $staff_test= new \Utility\AuthenticateStaff($request);
 
-        //Admin Authorization required
-        $staff_test= new \Utility\AuthenticateStaff();
-
-        //Check if an Admin is logged in
+        //Check if an Staff is logged in
         if($staff_test->fails()){
 
             return $staff_test->errors();
@@ -876,14 +868,9 @@ class StaffController extends Controller
         if($request->per_page){
             $per_page= \intval($request->per_page);
         }
-
-         /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
         
-        //Simulate Admin login
-        \Utility\SimulateLogin::admin();
-
         //Admin Authorization required
-        $admin_test= new \Utility\AuthorizeAdmin();
+        $admin_test= new \Utility\AuthorizeAdmin($request);
 
         //Check if an Admin is logged in
         if($admin_test->fails()){
@@ -964,14 +951,10 @@ class StaffController extends Controller
      * @return JSON JSON formatted response
      */
     public function store(Request $request)
-    {
-        /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
+    {        
         
-        //Simulate Admin login
-        \Utility\SimulateLogin::admin();
-
         //Admin Authorization required
-        $admin_test= new \Utility\AuthorizeAdmin();
+        $admin_test= new \Utility\AuthorizeAdmin($request);
 
         //Check if an Admin is logged in
         if($admin_test->fails()){
@@ -1084,12 +1067,8 @@ class StaffController extends Controller
     public function update(Request $request)
     {
 
-        //===============TO-DO: REMOVE THIS!!!!====================
-        //Simulate Admin login
-        \Utility\SimulateLogin::staff();
-
         //Staff Authorization required
-        $staff_test= new \Utility\AuthorizeAdmin();
+        $staff_test= new \Utility\AuthorizeAdmin($request);
 
         //Check if an Admin is logged in
         if($staff_test->fails()){
@@ -1186,13 +1165,10 @@ class StaffController extends Controller
      * 
      * @return null 204 response code
      */
-    public function delete($email){
-
-        //Simulate Admin login
-        \Utility\SimulateLogin::admin();
+    public function delete(Request $request, $email){
 
         //Admin Authorization required
-        $admin_test= new \Utility\AuthorizeAdmin();
+        $admin_test= new \Utility\AuthorizeAdmin($request);
 
         //Check if an Admin is logged in
         if($admin_test->fails()){

@@ -550,13 +550,34 @@ class CustomerController extends Controller
         }
 
 
+        $login_status= CustomerController::cookie_login_facilitator($remember_cookie);
+
+        //FAILED LOGIN
+        if( !$login_status ){
+            return redirect()->route('customer_manual_login');
+        }
+
+        //SUCCESS AUTHENTICATION
+        return response()->json([
+            'message' => 'Authentication Successful.'
+        ], 200);
+        
+
+    }
+
+
+    /**
+     * Static method that facilitates cookie login
+     */
+    public static function cookie_login_facilitator($remember_cookie){
+
         //Check for Customer with matching cookie
         $customer_login= Customer::where('remember_token', $remember_cookie)->first();
 
-        //Customer not found, redirect to /api/customer/login/manual
+        //Customer not found, return false
         if( empty($customer_login) || $customer_login->count() <= 0 ){
 
-            return redirect()->route('customer_manual_login');
+            return false;
 
         }
 
@@ -567,13 +588,11 @@ class CustomerController extends Controller
 
         //FAILED LOGIN
         if( !Auth::guard('web')->check() ){
-            return redirect()->route('customer_manual_login');
+            return false;
         }
 
         //SUCCESS AUTHENTICATION
-        return response()->json([
-            'message' => 'Authentication Successful.'
-        ], 200);
+        return true;
         
 
     }
@@ -694,18 +713,21 @@ class CustomerController extends Controller
      * 
      * @return JSON JSON formatted response
      */
-    public function logout(){
+    public function logout(Request $request){
 
-        \Utility\SimulateLogin::customer();
+        //Customer Authorization required
+        $login_test= new \Utility\AuthenticateCustomer($request);
 
-        //If no user is logged in, return an error reponse
-        if ( !Auth::guard('web')->check() ){
+        //Check if a Customer is logged in
+        if($login_test->fails()){
 
             return response()->json([
-                'error' => 'no user is logged in'
+                "error" => "No user is logged in"
             ], 404);
 
         }
+
+        //SUCCESS Customer Login
 
         //If a user is currently logged in....
         
@@ -752,13 +774,6 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
 
-        /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
-        //===============TO-DO: REMOVE THIS!!!!====================
-        //Login Simulation
-        \Utility\SimulateLogin::staff();
-        //========================================================
-
-
         //Set default per_page value for pagination
         $per_page= 20;
 
@@ -769,7 +784,7 @@ class CustomerController extends Controller
 
         
         //Authenticate staff
-        $staff_test= new \Utility\AuthenticateStaff();
+        $staff_test= new \Utility\AuthenticateStaff($request);
 
         //Failed Authentication
         if($staff_test->fails()){
@@ -794,16 +809,10 @@ class CustomerController extends Controller
      */
     public function show($email)
     {
-        /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
-        //===============TO-DO: REMOVE THIS!!!!====================
-        //Login Simulation
-        \Utility\SimulateLogin::staff();
-        //========================================================
-
-
+    
         
         //Authenticate staff
-        $staff_test= new \Utility\AuthenticateStaff();
+        $staff_test= new \Utility\AuthenticateStaff($request);
 
         //Failed Authentication
         if($staff_test->fails()){
@@ -850,14 +859,8 @@ class CustomerController extends Controller
             $per_page= \intval($request->per_page);
         }
 
-
-        /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
-
-       //Simulate Admin login
-       \Utility\SimulateLogin::staff();
-
        //Authenticate staff
-       $staff_test= new \Utility\AuthenticateStaff();
+       $staff_test= new \Utility\AuthenticateStaff($request);
 
        //Failed Authentication
        if($staff_test->fails()){
@@ -939,22 +942,20 @@ class CustomerController extends Controller
      *
      * @return JSON JSON formatted response
      */
-    public function self()
+    public function self(Request $request)
     {   
         
-        //===============TO-DO: REMOVE THIS!!!!====================
-        //Login Simulation
-        \Utility\SimulateLogin::customer();
-        //========================================================
-        
-        //If the current user is not authenticated
-        if(!Auth::guard('web')->check()){
+        //Customer Authorization required
+        $login_test= new \Utility\AuthenticateCustomer($request);
 
-            return response()->json( [
-                'error' => 'Please login.'
-            ], 401);
+        //Check if an Customer is logged in
+        if($login_test->fails()){
+
+            return $login_test->errors();
 
         }
+
+        //SUCCESS Customer Login
 
         //Return User Data
         return new CustomerResource(Auth::user());
@@ -1087,20 +1088,15 @@ class CustomerController extends Controller
     public function update(Request $request)
     {
 
-        //===============TO-DO: REMOVE THIS!!!!====================
-        //Login Simulation
-        \Utility\SimulateLogin::customer();
-        //========================================================
+        //Customer Authorization required
+        $login_test= new \Utility\AuthenticateCustomer($request);
 
-        //If the current user is not authenticated
-        if(!Auth::guard('web')->check()){
+        //Check if an Customer is logged in
+        if($login_test->fails()){
 
-            return response()->json( [
-                'error' => 'Please login.'
-            ], 401);
+            return $login_test->errors();
 
         }
-
 
 
         //SUCCESS AUTHENTICATION
@@ -1192,15 +1188,9 @@ class CustomerController extends Controller
      */
     public function delete($email){
 
-        /* =================IMPLEMENT: STAFF AUTHORIZATION REQUIRED======================== */
-        //===============TO-DO: REMOVE THIS!!!!====================
-        //Login Simulation
-        \Utility\SimulateLogin::staff();
-        //========================================================
-
         
        //Authenticate staff
-       $staff_test= new \Utility\AuthenticateStaff();
+       $staff_test= new \Utility\AuthenticateStaff($request);
 
        //Failed Authentication
        if($staff_test->fails()){

@@ -4,48 +4,47 @@ namespace Utility;
 
 use Illuminate\Http\Request;
 
-use App\Staff;
-use  App\Http\Controllers\StaffController;
+use App\Customer;
+use  App\Http\Controllers\CustomerController;
 
 use Illuminate\Support\Facades\Auth;
 
-class AuthenticateStaff {
+class AuthenticateCustomer {
 
-    protected $valid_staff= false;
+    protected $valid_customer= false;
 
     function __construct(Request $request){
 
         //Pull "X-REMEMBER" cookie from request
-        $remember_cookie= $request->cookie('X-REMEMBER');
+        $remember_cookie= $request->cookie('X-REMEMBER-CUSTOMER');
 
         //Validate Staff Authentication
         //If a staff is signed in
-        if( Auth::guard('staffs')->check() ){
+        if( Auth::guard('web')->check() ){
 
-            $this->valid_staff= true;
+            $this->valid_customer= true;
 
         }
         //Try Login with X-REMEMBER token
         else if($remember_cookie){
 
-            $login_attempt= StaffController::cookie_login_facilitator($remember_cookie);
+            $login_attempt= CustomerController::cookie_login_facilitator($remember_cookie);
 
             //SUCCESS
             if($login_attempt){
 
-                $this->valid_staff= true;
+                $this->valid_customer= true;
 
             }
 
         }
-
 
     }
 
     public function fails(){
 
         //If no valid staff is logged in
-        if(!$this->valid_staff){
+        if(!$this->valid_customer){
 
             return true;
 
@@ -61,11 +60,12 @@ class AuthenticateStaff {
 
         //Return a Response with authentication Error
         return response()->json( [
-            "failed_authentication" => "Please login as a staff." 
+            "failed_authentication" => "Please login." 
         ], 401);
 
     }
 
 }
+
 
 ?>

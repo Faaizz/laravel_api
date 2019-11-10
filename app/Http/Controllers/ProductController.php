@@ -1199,8 +1199,6 @@ class ProductController extends Controller
      */
     public function store(Request $request){
 
-         /* ========SIMULATE admin LOGIN========== */
-         //\Utility\SimulateLogin::admin();
 
          //Admin Authorization required
          $admin_test= new \Utility\AuthorizeAdmin($request);
@@ -1334,11 +1332,9 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id){
 
-         /* ========SIMULATE admin LOGIN========== */
-         \Utility\SimulateLogin::admin();
-
+        
          //Admin Authorization required
-         $admin_test= new \Utility\AuthorizeAdmin();
+         $admin_test= new \Utility\AuthorizeAdmin($request);
  
          //Check if an Admin is logged in
          if($admin_test->fails()){
@@ -1555,11 +1551,8 @@ class ProductController extends Controller
      */
     public function delete($id){
 
-         /* ========SIMULATE admin LOGIN========== */
-         \Utility\SimulateLogin::admin();
-
          //Admin Authorization required
-         $admin_test= new \Utility\AuthorizeAdmin();
+         $admin_test= new \Utility\AuthorizeAdmin($request);
  
          //Check if an Admin is logged in
          if($admin_test->fails()){
@@ -1607,11 +1600,8 @@ class ProductController extends Controller
      */
     public function massDelete(Request $request){
 
-         /* ========SIMULATE admin LOGIN========== */
-         \Utility\SimulateLogin::admin();
-
          //Admin Authorization required
-         $admin_test= new \Utility\AuthorizeAdmin();
+         $admin_test= new \Utility\AuthorizeAdmin($request);
  
          //Check if an Admin is logged in
          if($admin_test->fails()){
