@@ -727,8 +727,8 @@ class ProductController extends Controller
                                 'type' => 'string'
                             ],
 
-                            'size_and_quantity' => [
-                                'required' => false,
+                            'options' => [
+                                'required' => true,
                                 'description' => 'Array of product sizes and corresponding qunatity of each',
                                 'type' => 'array: array[
                                     "size" => string,
@@ -1357,7 +1357,7 @@ class ProductController extends Controller
             'price' => 'max:50|string',
             'color' => 'max:50|string',
             'material' => 'max:50|string',
-            'size_and_quantity' => 'JSON',
+            'options' => 'required|JSON',
             'image_one' => 'mimes:jpeg,gif,png',
             'image_two' => 'mimes:jpeg,gif,png',
             'image_three' => 'mimes:jpeg,gif,png',
@@ -1448,40 +1448,38 @@ class ProductController extends Controller
             $product->material= $buffer;
         }
 
-        //Validate "size_and_quantity" JSON array
-        $buffer= \json_decode($request->get('size_and_quantity'));
+        //Validate "options" JSON array
+        $options= \json_decode($request->get('options'));
+        $valid_options= false;
 
-        if($buffer){
-
-            $valid_size_and_quantity= false;
-
-            foreach($buffer as $a_s_and_q){
-                //check size string
-                if( !isset($a_s_and_q->size) | !isset($a_s_and_q->quantity) ){
-                    //if 'size' OR 'quantity' attribute does not exist, set validity to false and exit loop
-                    $valid_size_and_quantity= false;
-                    break;
-                }
-
-                //if 'quanity' is a valid integer
-                if (filter_var($a_s_and_q->quantity, FILTER_VALIDATE_INT))
-                    $valid_size_and_quantity= true;
-
+        foreach($options as $option){
+            //check size string
+            if( !isset($option->size) | !isset($option->quantity) ){
+                //if 'size' OR 'quantity' attribute does not exist, set validity to false and exit loop
+                $valid_options= false;
+                break;
             }
 
+            //if 'quanity' is a valid integer
+            if ( filter_var($option->size, FILTER_SANITIZE_STRING) 
+                    &&
+                filter_var($option->quantity, FILTER_VALIDATE_INT) 
+            )
+            $valid_options= true;
 
-            //CHECK FOR 'size_and_quantity' VALIDATION
-            if(!$valid_size_and_quantity){
-                return response()->json( [
-                    'size_and_quantity' => 'A valid JSON array of objects with "size" and "quantity fileds is required"'
-                ] ,401);
-            }
+        }
 
-            //IF VALID
-            if($valid_size_and_quantity){
-                $product->size_and_quantity= \json_encode($buffer);
-            }
 
+        //CHECK FOR 'options' VALIDATION
+        if(!$valid_options){
+            return response()->json( [
+                'options' => 'A valid JSON array of objects with "size" and "quantity fileds is required"'
+            ] ,401);
+        }
+
+        //IF VALID
+        if($valid_options){
+            $product->options= \json_encode($options);
         }
 
         //Images
@@ -1549,7 +1547,7 @@ class ProductController extends Controller
      * 
      * @return JSON JSON response
      */
-    public function delete($id){
+    public function delete(Request $request, $id){
 
          //Admin Authorization required
          $admin_test= new \Utility\AuthorizeAdmin($request);

@@ -81,7 +81,7 @@ class CustomerController extends Controller
 
                             'remember' => [
                                 'required' => false,
-                                'description' => 'Set "yes" if user wna==ants to stay logged in',
+                                'description' => 'Set "yes" if user wants to stay logged in',
                                 'type' => 'string'
                             ]
 
@@ -411,8 +411,8 @@ class CustomerController extends Controller
 
                 //UPDATE
                 [
-                    'path' => '/',
-                    'method' => 'PUT. NOTE: You have to use POST and then include a "_method: PUT" header',
+                    'path' => '/my_account',
+                    'method' => 'POST',
                     'description' => 'Update details of the current customer',
                     'authentication' => [
                         'api' => 'token',
@@ -807,7 +807,7 @@ class CustomerController extends Controller
      *
      * @return JSON JSON formatted response
      */
-    public function show($email)
+    public function show(Request $request, $email)
     {
     
         
@@ -958,7 +958,7 @@ class CustomerController extends Controller
         //SUCCESS Customer Login
 
         //Return User Data
-        return new CustomerResource(Auth::user());
+        return new CustomerResource(Auth::guard('web')->user());
 
     }
 
@@ -1186,7 +1186,7 @@ class CustomerController extends Controller
      * 
      * @return null 204 response code
      */
-    public function delete($email){
+    public function delete(Request $request, $email){
 
         
        //Authenticate staff

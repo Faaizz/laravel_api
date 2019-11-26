@@ -1045,7 +1045,7 @@ class StaffController extends Controller
         }
 
         //return the newly created staff
-        return response()->json($new_staff_saved, 200);
+        return new StaffResource($new_staff_saved);
     }
 
 
@@ -1068,7 +1068,7 @@ class StaffController extends Controller
     {
 
         //Staff Authorization required
-        $staff_test= new \Utility\AuthorizeAdmin($request);
+        $staff_test= new \Utility\AuthenticateStaff($request);
 
         //Check if an Admin is logged in
         if($staff_test->fails()){
