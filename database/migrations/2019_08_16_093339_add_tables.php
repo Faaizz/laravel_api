@@ -79,7 +79,7 @@ class AddTables extends Migration
             $table->integer('product_quantity');
             $table->string('customer_email', 100);
             $table->string('staff_email', 100)->nullable();
-            $table->enum('status', ["pending", "delivered", "failed"])->default("pending");
+            $table->enum('status', ["unassigned", "pending", "delivered", "failed"])->default("unassigned");
             $table->dateTime('est_del_date')->comment('estimated delivery date')->nullable();
             $table->dateTime('failure_date')->nullable();
             $table->string("failure_cause", 200)->default('');
@@ -134,7 +134,7 @@ class AddTables extends Migration
             $imagepatharray= json_decode($imagepatharray);
      
             foreach($imagepatharray as $imagepath){
-                 Storage::delete($imagepath);
+                 Storage::delete("public/".$imagepath);
             }
         }
 

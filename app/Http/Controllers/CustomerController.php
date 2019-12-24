@@ -165,7 +165,7 @@ class CustomerController extends Controller
 
                 //search
                 [
-                    'path' => '/',
+                    'path' => '/search',
                     'method' => 'ANY',
                     'description' => 'Search for Customer with specified details',
                     'authentication' => [
@@ -910,17 +910,11 @@ class CustomerController extends Controller
            $address= "";
        }
 
-       if ( !$gender ){
-           $gender= "";
-       }
-
-       
        //FIND MATCHED CUSTOMER AND PAGINATE MATCHES
        $customers= Customer::where('email', 'like', '%'. $email . '%')
                    ->where('first_name', 'like', '%' . $first_name . '%')
                    ->where('last_name', 'like', '%' . $last_name . '%')
                    ->where('address', 'like', '%' . $address . '%')
-                   ->where('gender', $gender)
                    ->paginate($per_page);
 
 

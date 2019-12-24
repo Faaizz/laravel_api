@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/storage/{file_name}', function ($file_name) {
+    return Storage::get($file_name);;
 });
 

@@ -25,7 +25,7 @@ class Staff extends JsonResource
             'address' => $this->address,
             'gender' => $this->gender,
             'phone_numbers' => $this->phone_numbers,
-            'privilege_level' => $this->when(Auth::guard('staffs')->user()->isAdmin(), $this->privilege_level),
+            'privilege_level' => $this->privilege_level,
             'created_at' => $this->when(Auth::guard('staffs')->user()->isAdmin(), $this->created_at),
             'updated_at' => $this->when(Auth::guard('staffs')->user()->isAdmin(), $this->updated_at),
          

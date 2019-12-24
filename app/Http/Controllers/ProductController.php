@@ -1060,8 +1060,8 @@ class ProductController extends Controller
             'section' => 'max:100|string',
             'sub_section' => 'max:50|string',
             'category' => 'max:50|string',
-            'min_price' => 'numeric',
-            'max_price' => 'numeric',
+            'min_price' => 'max:50|string',
+            'max_price' => 'max:50|string',
             'color' => 'max:50|string',
             'material' => 'max:50|string'
         ];
@@ -1275,9 +1275,15 @@ class ProductController extends Controller
         }
 
         //GET PRODUCT IMAGES
-        $image_one= $request->file('image_one')->store('products');
-        $image_two= $request->file('image_two')->store('products');
-        $image_three= $request->file('image_three')->store('products');
+        $image_one= $request->file('image_one')->store('public');
+        // REMOVE "public/" APPENDED TO FILENAME
+        $image_one= str_replace("public/", "", $image_one);
+        $image_two= $request->file('image_two')->store('public');
+        // REMOVE "public/" APPENDED TO FILENAME
+        $image_two= str_replace("public/", "", $image_two);
+        $image_three= $request->file('image_three')->store('public');
+        // REMOVE "public/" APPENDED TO FILENAME
+        $image_three= str_replace("public/", "", $image_three);
 
         //collect the paths of the images into an array
         $images= [$image_one, $image_two, $image_three];
@@ -1491,12 +1497,12 @@ class ProductController extends Controller
 
         if($buffer){
             //save new image
-            $new_image= $buffer->store('products');
+            $new_image= $buffer->store('public');
 
             //delete existing image
-            Storage::delete($images[0]);
+            Storage::delete("public/".$images[0]);
 
-            $images[0]= $new_image;
+            $images[0]= str_replace("public/", "", $new_image);
         }
 
         //image_two
@@ -1504,12 +1510,12 @@ class ProductController extends Controller
 
         if($buffer){
             //save new image
-            $new_image= $buffer->store('products');
+            $new_image= $buffer->store('public');
 
             //delete existing image
-            Storage::delete($images[1]);
+            Storage::delete("public/".$images[1]);
 
-            $images[1]= $new_image;
+            $images[0]= str_replace("public/", "", $new_image);
         }
 
         //image_three
@@ -1517,12 +1523,12 @@ class ProductController extends Controller
 
         if($buffer){
             //save new image
-            $new_image= $buffer->store('products');
+            $new_image= $buffer->store('public');
 
             //delete existing image
-            Storage::delete($images[2]);
+            Storage::delete("public/".$images[2]);
 
-            $images[2]= $new_image;
+            $images[0]= str_replace("public/", "", $new_image);
         }
 
         //Update product images

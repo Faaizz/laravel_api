@@ -58,6 +58,78 @@ class OrderController extends Controller
 
                 /* R  E  A  D */
 
+                //All Unassigned Orders
+                [
+                    'path' => '/unassigned',
+                    'method' => 'GET',
+                    'description' => 'returns all unassigned orders',
+                    'authentication' => [
+                        'api' => 'token',
+                        'login' => 'admin'
+                    ],
+                    'args' => [
+
+                        'GET' => [
+                            'page' => [
+                                'required' => false,
+                                'description' => 'current page',
+                                'type' => 'integer'
+                            ],
+                            'per_page' => [
+                                'required' => false,
+                                'description' => 'number of products to display per page',
+                                'type' => 'integer'
+                            ]
+                        ],
+
+                    ],
+                    'return_type' => 'json',
+                    'return_data_structure' => [
+                        'failed_authentication' => [
+                            'error' => 'Please login as an admin'
+                        ],
+                        'errors' => [
+                            'error' => 'error message'
+                        ],
+                        'success' => [
+                            'data' => [
+                                [
+                                    'id' => 'integer',
+                                    'product_id' => 'integer',
+                                    'product_color' => 'string',
+                                    'product_size' => 'string',
+                                    'product_quantity' => 'integer',
+                                    'customer_email' => 'string',
+                                    'staff_email' => 'string',
+                                    'status' => 'string',
+                                    'est_del_date' => 'string date in format(YYYY-MM-DD HH:MM:SS)',
+                                    'failure_date' => 'string date in format(YYYY-MM-DD HH:MM:SS)',
+                                    'failure_cause' => 'string',
+                                    'delivery_date' => 'string date in format(YYYY-MM-DD HH:MM:SS)',
+                                    'created_at' => 'string date in format(YYYY-MM-DD HH:MM:SS)',
+                                    'updated_at' => 'string date in format(YYYY-MM-DD HH:MM:SS)',
+
+                                ]
+                            ],
+                            'links' => [
+                                    'first' => 'string',
+                                    'last' => 'string',
+                                    'prev' => 'string',
+                                    'next' => 'string'
+                            ],
+                            'meta' => [
+                                    'current_page' => 'integer',
+                                    'from' => 'integer',
+                                    'last_page' => 'integer',
+                                    'path' => 'string',
+                                    'per_page' => 'integer',
+                                    'to' => 'integer',
+                                    'total' => 'integer'
+                            ]
+                        ]
+                    ]
+                ],
+
                 //All Pending Orders
                 [
                     'path' => '/pending',
@@ -377,7 +449,7 @@ class OrderController extends Controller
                 [
                     'path' => '/staff/{email}',
                     'method' => 'GET',
-                    'description' => 'returns all orders belonging to the specified customer',
+                    'description' => 'returns all pending orders assigned to the specified staff',
                     'authentication' => [
                         'api' => 'token',
                         'login' => 'staff'
@@ -1187,7 +1259,7 @@ class OrderController extends Controller
     public function staff(Request $request, $email){
 
         //Call ordersByEmail() utility function
-        return $this->ordersByEmail($request, $request->per_page, $email, 'staff', $request->status);
+        return $this->ordersByEmail($request, $request->per_page, $email, 'staff', "pending");
 
 
     }
@@ -1523,6 +1595,7 @@ class OrderController extends Controller
      * @param $request->failure_cause String cause of failure
      * @param $request->failure_date Date
      * @param $request->delivery_date Date
+     * @param $request->staff_email String
      * 
      * @return JSON JSON formatted response
      * 
@@ -1558,6 +1631,9 @@ class OrderController extends Controller
         if( $request_validator->fails() ){
             return response()->json( $request_validator->errors() ,401);
         }
+
+        // CONVERT TO LOWER CASE
+        $request->status= strtolower($request->status);
 
         //Ensure a valid order status is supplied
         $valid_status= $this::validateStatus($request->status);
@@ -1626,6 +1702,11 @@ class OrderController extends Controller
             //Update Order Status
             $order->status= $request->status;
 
+            //Update staff email if available
+            if($request->staff_email){
+                $order->staff_email= trim($request->staff_email);
+            }
+            
             //Update other available fields
             if($request->est_del_date){
                 $order->est_del_date= trim($request->est_del_date);
@@ -1674,6 +1755,24 @@ class OrderController extends Controller
             return new OrderResource($order);
 
         }
+
+    }
+
+
+    /**
+     * Returns unassigned orders
+     * =
+     * @param $request->status Order status
+     * @param $request->per_page Number of orders to display per page (optional)
+     * 
+     * 
+     * @return JSON JSON formatted response
+     * 
+     */
+    public function unassigned(Request $request){
+
+        //Call orders() utility function with "pending" status
+        return $this->ordersByStatus($request, $request->per_page, "unassigned");
 
     }
 
@@ -1839,11 +1938,11 @@ class OrderController extends Controller
     public static function validateStatus($status){
 
         //Validate $status
-        $valid_status= ['pending', 'failed', 'delivered'];
+        $valid_status= ['unassigned', 'pending', 'failed', 'delivered'];
 
         foreach($valid_status as $a_valid_status){
 
-            if($status == $a_valid_status){
+            if(strcasecmp($status, $a_valid_status)){
                return true;
             }
 

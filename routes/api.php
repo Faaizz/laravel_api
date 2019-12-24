@@ -252,6 +252,9 @@ Route::middleware('auth:api')->delete('/staff/{email}', 'StaffController@delete'
   //By Staff
   Route::middleware('auth:api')->get('/orders/staff/{email}', 'OrderController@staff');
 
+   //All Unassigned Orders
+ Route::middleware('auth:api')->get('/orders/unassigned', 'OrderController@unassigned');
+
   //By Product
   Route::middleware('auth:api')->get('/orders/product/{id}', 'OrderController@product')
                                 ->where(
