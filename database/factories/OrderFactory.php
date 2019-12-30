@@ -11,7 +11,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Order::class, function (Faker $faker) {
 
-    $productSizes= ['xs', 'sm', 'md', 'lg', 'xl', 'xxl', 'xxxl'];
+    $productSizes= ['XS', 'SM', 'MD', 'LG', 'XL'];
 
     //get all available customers
     $customers= Customer::all();
@@ -31,7 +31,8 @@ $factory->define(Order::class, function (Faker $faker) {
         //select a random customer for the order
         'customer_email' => $customers->random()->email,
         //select a random staff for the order
-        'staff_email' => $staffs->random()->email,
+        //'staff_email' => $staffs->random()->email,
+        'staff_email' => "dennis.krumacker@dkfi.de",
         'status' => 'pending'
         
     ];
