@@ -10,18 +10,21 @@ use Illuminate\Support\Str;
 use Storage\Misc\Functions as MiscFunctions;
 
 $factory->define(Staff::class, function (Faker $faker) {
+
+    $gender= MiscFunctions\getGender();
+
     return [
-        'first_name' => $faker-> name,
-        'last_name' => $faker->name,
+        'first_name' => $faker->firstName($gender),
+        'last_name' => $faker->lastName,
         'email' => $faker->unique()->email,
-        'password' => $faker->text(50),
+        'password' => Str::random(20),
         'address' => $faker->address,
-        'gender'=> MiscFunctions\getGender(),
+        'gender'=> $gender,
         'phone_numbers'=> json_encode(
             [
-                '+234' . $faker->randomNumber(8),
-                '+234' . $faker->randomNumber(8),
-                '+234' . $faker->randomNumber(8)
+                $faker->e164PhoneNumber,
+                $faker->e164PhoneNumber,
+                $faker->e164PhoneNumber
             ]
             ),
         'api_token' => Str::random(60)

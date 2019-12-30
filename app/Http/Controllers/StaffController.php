@@ -1014,6 +1014,20 @@ class StaffController extends Controller
         }
 
 
+        // validate privilege_level
+        $privilege_level= "staff";
+
+        if($request->privilege_level){
+
+            if($request->privilege_level == "admin"){
+
+                $privilege_level= "admin";
+
+            }
+
+        }
+
+
         //SUCCESS VALIDATION
 
         //create new staff with provided data
@@ -1026,6 +1040,7 @@ class StaffController extends Controller
         $new_staff->address= $request->address;
         $new_staff->gender= $request->gender;
         $new_staff->phone_numbers= $request->phone_numbers;
+        $new_staff->privilege_level= $privilege_level;
 
         //Generate api-token
         $new_staff->api_token= Str::random(60);
@@ -1198,7 +1213,7 @@ class StaffController extends Controller
         if($orders->count() > 0){
 
             return response()->json( [
-                'error' => 'Could not delete. Staff with email: ' . $email . ' has existing orders.'
+                'error' => 'Could not delete. Staff with email: ' . $email . ' has ' . $orders->count() .' existing orders.'
             ], 404);
 
         }

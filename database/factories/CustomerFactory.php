@@ -10,20 +10,20 @@ use Storage\Misc\Functions as MiscFunctions;
 
 $factory->define(Customer::class, function (Faker $faker) {
 
-
+    $gender= MiscFunctions\getGender();
 
     return [
-        'first_name'=> $faker->firstName,
+        'first_name'=> $faker->firstName($gender),
         'last_name'=> $faker->lastName,
         'email'=> $faker->unique()->safeEmail,
         'password'=> $faker->text(50),
         'address'=> $faker->address,
-        'gender'=> MiscFunctions\getGender(),
+        'gender'=> $gender,
         'phone_numbers'=> json_encode(
             [
-                '+234' . $faker->randomNumber(8),
-                '+234' . $faker->randomNumber(8),
-                '+234' . $faker->randomNumber(8)
+                $faker->e164PhoneNumber,
+                $faker->e164PhoneNumber,
+                $faker->e164PhoneNumber
             ]
             )
     ];

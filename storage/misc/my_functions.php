@@ -135,6 +135,112 @@ namespace Storage\Misc\Functions{
          return $categories[rand(0, ($categories_count-1) )];
     
     }
+
+    /**
+     * This function give a json array of randomly selected images of the format "section_1"- here the image number is "1"
+     * @param section
+     * @return json array
+     */
+
+    function getImages($section, $sub_section){
+
+        switch($section){
+
+            // FOR BAGS AND WATCHES
+
+            case "bags & watches":
+                {
+                    $section= "bags_watches";
+                    return json_encode( [$section."_".rand(1, 10).".jpeg", $section."_".rand(1, 10).".jpeg", $section."_".rand(1, 10).".jpeg"] );
+                }
+                break;
+
+            // FOR ACCESSORIES
+
+            case "accessories":
+                {
+                    $section= "accessories_male";
+                    return json_encode( [$section."_".rand(1, 10).".jpeg", $section."_".rand(1, 10).".jpeg", $section."_".rand(1, 10).".jpeg"] );
+                }
+                break;
+
+            // FOR ALL OTHER SECTIONS
+    
+            default:
+                {
+                    return json_encode( [$section."_".$sub_section."_".rand(1, 10).".jpeg", $section."_".$sub_section."_".rand(1, 10).".jpeg", $section."_".$sub_section."_".rand(1, 10).".jpeg"] );
+                }  
+                
+            
+    
+         }
+
+    }
+
+    /**
+     * This function gives a json array of sizes according to selected section
+     * @param section
+     * @return json array
+     */
+    function getOptions($section){
+
+        $cloth_sizes= ["XS", "SM", "MD", "LG", "XL", "XXL"];
+
+        switch($section){
+    
+            case "clothing":
+                {
+                    $size_one= $cloth_sizes[rand(0, (count($cloth_sizes)-1))];
+                    $size_two= $cloth_sizes[rand(0, (count($cloth_sizes)-1))];
+
+                    return json_encode([
+                        [
+                            "size" => $size_one,
+                            "quantity" => rand(1, 20)
+                        ],
+                        [
+                            "size" => $size_two,
+                            "quantity" => rand(1, 20)
+                        ]
+                    ]);
+                }
+                //"clothing break"
+                break;
+    
+            case "shoes":
+                {
+                    $size_one= rand(39, 45);
+                    $size_two= rand(39, 45);
+
+                    return json_encode([
+                        [
+                            "size" => $size_one,
+                            "quantity" => rand(1, 20)
+                        ],
+                        [
+                            "size" => $size_two,
+                            "quantity" => rand(1, 20)
+                        ]
+                    ]);
+
+                }
+                //"shoes" break
+                break;
+            
+            default:
+                {
+                    return json_encode([
+                        [
+                            "size" => "one size",
+                            "quantity" => rand(1, 20)
+                        ]
+                    ]);
+                }               
+            
+    
+         }
+
+    }
     
 }
 

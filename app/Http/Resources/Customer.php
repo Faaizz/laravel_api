@@ -27,8 +27,7 @@ class Customer extends JsonResource
             'newsletters' => $this->newsletters,
 
             //pending orders
-            'pending_orders' => \App\Order::where(
-                                                    ['customer_email'=> $this->email,
+            'pending_orders' => \App\Order::where(  ['customer_email'=> $this->email,
                                                      'status' => 'pending'
                                                     ])->get()->count()
         ];

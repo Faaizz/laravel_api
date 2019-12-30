@@ -5,7 +5,7 @@
 use App\Product;
 use Faker\Generator as Faker;
 
-//The source php file is required from "DatabaseSeede.php"
+//The source php file is required from "DatabaseSeeder.php"
 use Storage\Misc\Functions as MiscFunctions;
 
 $factory->define(Product::class, function (Faker $faker) {
@@ -14,23 +14,21 @@ $factory->define(Product::class, function (Faker $faker) {
     $section= MiscFunctions\getSection();
     $sub_section= MiscFunctions\getGender();
     $category= MiscFunctions\getCategory($section, $sub_section);
+    $images= MiscFunctions\getImages($section, $sub_section);
+    $options= MiscFunctions\getOptions($section);
 
     return [
-        'name'=> $faker->text(75),
-        'brand'=> $faker->word,
-        'description'=> $faker->text(1000),
+        'name'=> $faker->words(4, true),
+        'brand'=> $faker->company,
+        'description'=> $faker->text(100),
         'section'=> $section,
         'sub_section'=> $sub_section,
         'category' => $category,
-        'price'=> $faker->randomFloat(2),
+        'price'=> $faker->randomFloat(2, 2000, 25000),
         'color'=> $faker->colorName,
         'material'=> $faker->word,
-        'images'=> json_encode(
-            []
-        ),
-        'options'=> json_encode(
-            []
-        )
+        'images'=> $images,
+        'options'=> $options
 
     ];
 });

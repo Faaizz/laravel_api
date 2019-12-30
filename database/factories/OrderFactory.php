@@ -32,6 +32,7 @@ $factory->define(Order::class, function (Faker $faker) {
         'customer_email' => $customers->random()->email,
         //select a random staff for the order
         'staff_email' => $staffs->random()->email,
+        'status' => 'pending'
         
     ];
 });
