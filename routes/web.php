@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('test', function(Request $request){
+Route::get('/test', function(Request $request){
     
    return response()->json("Hi There", 200);
 });
