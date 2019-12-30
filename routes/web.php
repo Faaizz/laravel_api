@@ -11,6 +11,12 @@
 |
 */
 
+Route::get('test', function(Request $request){
+    
+   return response()->json("Hi There", 200);
+});
+
+
 Route::get('/storage/{file_name}', function ($file_name) {
     return Storage::get($file_name);;
 });
