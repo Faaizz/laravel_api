@@ -21,7 +21,3 @@ Route::get('/storage/{file_name}', function ($file_name) {
     return Storage::get($file_name);
 });
 
-Route::get( 'demo_app', function(){
-    return Storage::download("demo_app.zip");
-} );
-
