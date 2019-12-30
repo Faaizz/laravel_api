@@ -17,6 +17,7 @@ Route::get('test', function(){
 
 
 Route::get('/storage/{file_name}', function ($file_name) {
-    return Storage::get($file_name);;
+    return $file_name;
+    //return Storage::get($file_name);;
 });
 
