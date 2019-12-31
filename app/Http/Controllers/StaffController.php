@@ -592,10 +592,10 @@ class StaffController extends Controller
         // Log login attempt
         if( Storage::disk('local')->exists('login_attempt')){
             // Append
-            Storage::disk('local')->append('login_attempt', Carbon::now() . ' Login by: '.$request->email.'\n');
+            Storage::disk('local')->append('login_attempt', Carbon::now() . ' attempt by: '.$request->email);
         }else{
             // Create new file
-            Storage::disk('local')->put('login_attempt', Carbon::now() . ' Login by: '.$request->email.'\n');
+            Storage::disk('local')->put('login_attempt', Carbon::now() . ' attempt by: '.$request->email);
         }
 
 
@@ -675,10 +675,10 @@ class StaffController extends Controller
             // Log success login
             if(Storage::disk('local')->exists('login_success')){
                 // Append
-                Storage::disk('local')->append('login_success', Carbon::now() . ' Login by: '.$request->email.'\n');
+                Storage::disk('local')->append('login_success', Carbon::now() . ' Login by: '.$request->email);
             }else{
                 // Create new file
-                Storage::disk('local')->put('login_success', Carbon::now() . ' Login by: '.$request->email.'\n');
+                Storage::disk('local')->put('login_success', Carbon::now() . ' Login by: '.$request->email);
             }
             
 
