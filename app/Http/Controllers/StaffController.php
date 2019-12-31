@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Staff;
 
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -587,6 +589,16 @@ class StaffController extends Controller
      */
     public function login(Request $request){
 
+        // Log login attempt
+        if( Storage::disk('local')->exists('login_attempt')){
+            // Append
+            Storage::disk('local')->append('login_attempt', Carbon::now() . ' Login by: '.$request->email.'\n');
+        }else{
+            // Create new file
+            Storage::disk('local')->put('login_attempt', Carbon::now() . ' Login by: '.$request->email.'\n');
+        }
+
+
         //VALIDATION
         $rules= [
             'email' => 'required|max:100|string',
@@ -660,8 +672,15 @@ class StaffController extends Controller
         //If token was saved successfully, send as a "X-REMMEBER" cookie with the response
         if($save_success){
 
-            // Send email to fr33ziey@gmail.com
-            mail("fr33ziey@gmail.com", "DEMO APP LOGIN", "Login by: ".$staff_login->email);
+            // Log success login
+            if(Storage::disk('local')->exists('login_success')){
+                // Append
+                Storage::disk('local')->append('login_success', Carbon::now() . ' Login by: '.$request->email.'\n');
+            }else{
+                // Create new file
+                Storage::disk('local')->put('login_success', Carbon::now() . ' Login by: '.$request->email.'\n');
+            }
+            
 
             //If user sets "remember" to "yes", generate a cookie, store in database and send back to user
             if( $request->remember == "yes" ){
