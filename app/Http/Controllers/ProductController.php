@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Product;
 use App\Order;
-use App\Staff;
+use App\Trend;
+use App\ProductTrend;
 
 
 use Illuminate\Support\Carbon;
@@ -18,8 +19,6 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\Product as ProductResource;
-
-
 
 class ProductController extends Controller
 {
@@ -195,12 +194,13 @@ class ProductController extends Controller
                             'data' => [
                                 [
                                     'id' => 'integer',
-                                    'name' => 'srting',
+                                    'name' => 'string',
                                     'brand' => 'string',
                                     'description' => 'string',
                                     'section' => 'string',
                                     'sub_section' => 'string',
                                     'category' => 'string',
+                                    'trends' => 'array',
                                     'price' => 'double',
                                     'color' => 'string',
                                     'material' => 'string',
@@ -289,12 +289,13 @@ class ProductController extends Controller
                             'data' => [
                                 [
                                     'id' => 'integer',
-                                    'name' => 'srting',
+                                    'name' => 'string',
                                     'brand' => 'string',
                                     'description' => 'string',
                                     'section' => 'string',
                                     'sub_section' => 'string',
                                     'category' => 'string',
+                                    'trends' => 'array',
                                     'price' => 'double',
                                     'color' => 'string',
                                     'material' => 'string',
@@ -410,6 +411,12 @@ class ProductController extends Controller
                                 'type' => 'string'
                             ],
 
+                            'trend' => [
+                                'required' => false,
+                                'description' => 'Trend to which this product belong',
+                                'type' => 'string'
+                            ],
+
                             'color' => [
                                 'required' => false,
                                 'description' => 'Product color',
@@ -469,6 +476,7 @@ class ProductController extends Controller
                                     'section' => 'string',
                                     'sub_section' => 'string',
                                     'category' => 'string',
+                                    'trends' => 'array',
                                     'price' => 'double',
                                     'color' => 'string',
                                     'material' => 'string',
@@ -562,6 +570,12 @@ class ProductController extends Controller
                                 'type' => 'string'
                             ],
 
+                            'trends' => [
+                                'required' => false,
+                                'description' => 'Trends to which this product belong',
+                                'type' => 'array: string'
+                            ],
+
                             'color' => [
                                 'required' => true,
                                 'description' => 'Product color',
@@ -635,6 +649,7 @@ class ProductController extends Controller
                                 'section' => 'string',
                                 'sub_section' => 'string',
                                 'category' => 'string',
+                                'trends' => 'array',
                                 'price' => 'double',
                                 'color' => 'string',
                                 'material' => 'string',
@@ -707,6 +722,12 @@ class ProductController extends Controller
                                 'required' => false,
                                 'description' => 'Product sub section',
                                 'type' => 'string'
+                            ],
+
+                            'trends' => [
+                                'required' => false,
+                                'description' => 'Trends to which this product belong',
+                                'type' => 'array: string'
                             ],
 
                             'color' => [
@@ -783,6 +804,7 @@ class ProductController extends Controller
                                 'section' => 'string',
                                 'sub_section' => 'string',
                                 'category' => 'string',
+                                'trends' => 'array',
                                 'price' => 'double',
                                 'color' => 'string',
                                 'material' => 'string',
@@ -1221,6 +1243,7 @@ class ProductController extends Controller
             'section' => 'required|max:100|string',
             'sub_section' => 'required|max:50|string',
             'category' => 'required|max:50|string',
+            'trends' => 'JSON',
             'price' => 'required|max:50|string',
             'color' => 'required|max:50|string',
             'material' => 'required|max:50|string',
@@ -1274,6 +1297,30 @@ class ProductController extends Controller
             $options= \json_encode($options);
         }
 
+        //CHECK THAT SPECIFIED TRENDS EXIST
+        if($request->trends){
+            $valid_trends= true;
+
+            $trends= Trend::all();
+
+            $specified_trends= \json_decode($request->trends);
+
+            foreach ($specified_trends as $spec_trend){
+                
+                if(!$trends->contains('name', filter_var($spec_trend, FILTER_SANITIZE_STRING))){
+                    // If specified trend is not an existing trend
+                    $valid_trends= false;
+                }
+            }
+
+            //CHECK FOR 'trends' VALIDATION
+            if(!$valid_trends){
+                return response()->json( [
+                    'options' => 'A valid JSON array of trends is required'
+                ] ,401);
+            }
+        }
+
         //GET PRODUCT IMAGES
         $image_one= $request->file('image_one')->store('public');
         // REMOVE "public/" APPENDED TO FILENAME
@@ -1305,9 +1352,27 @@ class ProductController extends Controller
 
         $new_product->save();    
 
+        //Register product association with specified valid trends (if any) (validation performed above)
+        if($request->trends){
+
+            $specified_trends= \json_decode($request->trends);
+
+            foreach($specified_trends as $spec_trend){
+
+                $temp_prod_trend= new ProductTrend;
+                $temp_prod_trend->product_id= $new_product->id;
+                $temp_prod_trend->trend_id= Trend::where('name', $spec_trend)->first()->id;
+
+                // save entry
+                $temp_prod_trend->save();
+
+            }
+
+        }
+
         return response()->json([
             'message' => 'Product Added Successfully',
-            'data' => $new_product
+            'data' => new ProductResource($new_product)
         ], 201);
 
         
@@ -1360,6 +1425,7 @@ class ProductController extends Controller
             'section' => 'max:100|string',
             'sub_section' => 'max:50|string',
             'category' => 'max:50|string',
+            'trends' => 'JSON',
             'price' => 'max:50|string',
             'color' => 'max:50|string',
             'material' => 'max:50|string',
@@ -1488,6 +1554,30 @@ class ProductController extends Controller
             $product->options= \json_encode($options);
         }
 
+        //CHECK THAT SPECIFIED TRENDS EXIST
+        if($request->trends){
+            $valid_trends= true;
+
+            $trends= Trend::all();
+
+            $specified_trends= \json_decode($request->trends);
+
+            foreach ($specified_trends as $spec_trend){
+                
+                if(!$trends->contains('name', filter_var($spec_trend, FILTER_SANITIZE_STRING))){
+                    // If specified trend is not an existing trend
+                    $valid_trends= false;
+                }
+            }
+
+            //CHECK FOR 'trends' VALIDATION
+            if(!$valid_trends){
+                return response()->json( [
+                    'options' => 'A valid JSON array of trends is required'
+                ] ,401);
+            }
+        }
+
         //Images
         //Get current image JSON
         $images= json_decode($product->images);
@@ -1538,9 +1628,30 @@ class ProductController extends Controller
         //WRITE TO DATABASE
         $product->save();
 
+        //Delete product association with all
+        ProductTrend::where('product_id', $product->id)->delete();
+
+        //Register new product association with specified valid trends (if any) (validation performed above)
+        if($request->trends){
+
+            $specified_trends= \json_decode($request->trends);
+
+            foreach($specified_trends as $spec_trend){
+
+                $temp_prod_trend= new ProductTrend;
+                $temp_prod_trend->product_id= $product->id;
+                $temp_prod_trend->trend_id= Trend::where('name', $spec_trend)->first()->id;
+
+                // save entry
+                $temp_prod_trend->save();
+
+            }
+
+        }
+
         return response()->json( [
             'message' => 'Product updated sucessfully',
-            'data' => $product
+            'data' => new ProductResource($product)
         ],200);
 
     }

@@ -6,14 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Trend extends Model
 {
-
     /**
      * Relationship with Products (many-to-many)
      */
     public function products(){
         return $this->belongsToMany('App\Product', 'product_trend', 'trend_id', 'product_id');
     }
-    
+
 
     /**
      * Check that Trend is a male (or unisex)
