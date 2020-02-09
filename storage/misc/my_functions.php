@@ -6,6 +6,20 @@
  */
 namespace Storage\Misc\Functions{
 
+    function getTrendGender(){
+        /**
+         * Gives a "male" or "female" or 'unisex' string as gender
+         * @return string
+         */
+
+        //gender array
+        $gender= ["male", "female", "unisex"];
+    
+        //return a random selection of gender
+        return $gender[rand(0,2)];
+    }
+    
+
     function getGender(){
         /**
          * Gives a "male" or "female" string as gender

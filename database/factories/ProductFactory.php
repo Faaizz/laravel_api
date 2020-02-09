@@ -5,7 +5,6 @@
 use App\Product;
 use Faker\Generator as Faker;
 
-//The source php file is required from "DatabaseSeeder.php"
 use Storage\Misc\Functions as MiscFunctions;
 
 $factory->define(Product::class, function (Faker $faker) {

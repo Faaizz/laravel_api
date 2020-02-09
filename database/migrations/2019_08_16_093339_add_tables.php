@@ -15,6 +15,20 @@ class AddTables extends Migration
      */
     public function up()
     {
+
+        /**
+         * Trends Table
+         */
+        Schema::create('trends', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name', 100);
+            $table->longText('description'); 
+            $table->enum('gender', ['male', 'female', 'unisex']);
+            $table->json('images');
+            $table->timestamps();
+        });
+
+
         /**
          * Products Table
          */
@@ -31,6 +45,18 @@ class AddTables extends Migration
             $table->string('material', 50);
             $table->json('images');
             $table->json('options');
+            $table->timestamps();
+        });
+
+
+        /**
+         * product_trend Table
+         * This table maps the many-to-many relationship between products and trends
+         */
+        Schema::create('product_trend', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->integer('product_id');
+            $table->integer('trend_id');
             $table->timestamps();
         });
     
@@ -124,7 +150,10 @@ class AddTables extends Migration
     {
         Schema::dropIfExists('orders');
 
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('trends');
+
+        Schema::dropIfExists('products_trends');
+
         //DELETE IMAGES
         $images_arrays= DB::table('products')->pluck('images');
         $images_array= $images_arrays->flatten();
@@ -138,7 +167,8 @@ class AddTables extends Migration
             }
         }
 
-        
+        Schema::dropIfExists('products');        
+        Schema::dropIfExists('product_trend');        
         Schema::dropIfExists('settings');
         Schema::dropIfExists('customers');
         Schema::dropIfExists('staffs');
