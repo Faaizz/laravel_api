@@ -14,6 +14,15 @@ class Trend extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'gender' => $this->gender,
+            'products_number' => $this->products->count(),
+            'images' => $this->images,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
+        ];
     }
 }
