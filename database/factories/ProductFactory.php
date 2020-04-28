@@ -17,7 +17,7 @@ $factory->define(Product::class, function (Faker $faker) {
     $options= MiscFunctions\getOptions($section);
 
     return [
-        'name'=> $faker->words(4, true),
+        'name'=> $faker->words(2, true),
         'brand'=> $faker->company,
         'description'=> $faker->text(100),
         'section'=> $section,

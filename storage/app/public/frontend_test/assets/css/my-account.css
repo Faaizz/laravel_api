@@ -1,0 +1,10 @@
+.account-options {
+  padding: 10px;
+  padding-top: 30px;
+}
+
+.account-options a {
+  text-decoration: none;
+  color: inherit;
+}
+
