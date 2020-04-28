@@ -924,7 +924,7 @@ class ProductController extends Controller
 
 
         //Set default per_page value for pagination
-        $per_page= 20;
+        $per_page= 10;
 
         //if a per_page parameter is included with the request, set it
         if($request->per_page){
@@ -985,7 +985,7 @@ class ProductController extends Controller
     public function new(Request $request, $weeks=3, $section=null, $sub_section=null, $category=null){
 
         //Set default per_page value for pagination
-        $per_page= 20;
+        $per_page= 10;
 
         //if a per_page parameter is included with the request, set it
         if($request->per_page){
@@ -1158,7 +1158,7 @@ class ProductController extends Controller
 
         //PAGINATION
         //Set default per_page value for pagination
-        $per_page= 20;
+        $per_page= 10;
 
         //if a per_page parameter is included with the request, set it
         if($request->per_page){
