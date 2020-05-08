@@ -36,6 +36,20 @@ class RootController extends Controller
                     'description' => 'get available information about this resource'
                 ],
 
+                //ORDERS
+                [
+                    'path' => '/orders',
+                    'method' => 'OPTIONS',
+                    'description' => 'get available information about this resource'
+                ],
+
+                //STAFF
+                [
+                    'path' => '/staff',
+                    'method' => 'OPTIONS',
+                    'description' => 'get available information about this resource'
+                ],
+
             ]
 
 
