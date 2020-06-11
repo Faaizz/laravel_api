@@ -606,6 +606,77 @@ class TrendController extends Controller
 
     }
 
+    /**
+     * Return result of Trend search
+     * 
+     * @param string $request->name
+     * @param string $request->gender
+     * 
+     * @param string $request_>per_page Number of trends to diaplsy per page
+     * 
+     * @return JSON JSON formatted response of an array of matched trends
+     */
+    public function search(Request $request){
+
+        //VALIDATE SEARCH DATA
+        $rules= [
+            'name' => 'max:100|string',
+            'gender' => 'max:50|string'
+        ];
+
+        $request_validator= Validator::make($request->all(), $rules);
+
+        //FAILED VALIDATION
+        if($request_validator->fails()){
+            return response()->json($request_validator->errors() ,401);
+        }
+
+
+        //SUCCESS VALIDATION
+
+        $gender= $request->get('gender');
+
+        $name= $request->get('name');
+        //if no name is specified, set to empty string
+        if(!$name)
+            $name= '';
+
+        //PAGINATION
+        //Set default per_page value for pagination
+        $per_page= 10;
+
+        //if a per_page parameter is included with the request, set it
+        if($request->per_page){
+            $per_page= \intval($request->per_page);
+        }
+
+        //FIND MATCHED trends
+        $trends= Trend::where('name', 'like', '%'. $name . '%')
+                    ->where('gender', 'like', '%' . $gender. '%')
+                    ->paginate($per_page);
+
+
+        //if no result is found
+        if(count($trends) == 0){
+            return response()->json([
+                'error' => 'no matches found',
+                'search_params' => "Name: " . $name . ", Gender: ". $gender,
+                'meta' => [
+                        'current_page' => 0,
+                        'from' => 0,
+                        'last_page' => 0,
+                        'path' => $request->url(),
+                        'per_page' => 0,
+                        'to' => 0,
+                        'total' => 0
+            ]
+
+            ], 404);
+        }
+
+        return new TrendCollection($trends);
+    }
+
 
     /* U P D A T E */
 
@@ -796,10 +867,95 @@ class TrendController extends Controller
 
     }
 
+    /**
+     * Delete multiple trends
+     * 
+     * @param int $request->ids
+     * 
+     * @return JSON JSON response
+     */
+    public function massDelete(Request $request){
+
+        //Admin Authorization required
+        $admin_test= new \Utility\AuthorizeAdmin($request);
+
+        //Check if an Admin is logged in
+        if($admin_test->fails()){
+
+            return $admin_test->errors();
+
+        }
+
+        //SUCCESS Admin Authorization
+
+        //VALIDATION
+        $rules= [
+            'ids' => 'required|JSON'
+        ];
+
+        $request_validator= Validator::make($request->all(), $rules);
+
+        //FAILED VALIDATION
+        if($request_validator->fails()){
+            return response()->json($request_validator->errors(), 404);
+        }
+
+        //Pull trends to delete
+        $ids= json_decode($request->get('ids'));
+
+        $trends= Trend::find($ids);
+
+        //if number of matched trend does not equal number of passed ids, return an error
+        if($trends->count() != \count($ids)){
+
+            //check for missing trends
+            $missing= [];
+            
+            foreach($ids as $id){
+
+                if(!$trends->find($id)){
+                    \array_push($missing, $id);
+                }
+                
+            }
+
+            //return response with missing trend ids
+            return response()->json( [
+                'error' => "trend(s) with ids= " . json_encode($missing) . " not found"
+            ], 404);
+        }
+
+        
+        //Delete trends
+        $errors= [];
+        foreach($trends as $trend){
+
+            $trend->delete();
+
+            //verify trend was sucessfully deleted
+            $trend_check= Trend::find($trend->id);
+
+            //if trend still exists
+            if($trend_check){
+                $errors[$trend->id]= 'Could not delete! an unknown error ocurred.';
+                continue;
+            }
+
+        }
+
+        //if errors
+        if($errors){
+            return response()->json( $errors ,401);
+        }
+
+        return response()->json([], 204);
+
+   }
+
 
     /* S  H  O  W    P  R  O  D  U  C  T  S */
     /**
-     * Return products associated with the trend with specified id
+     * Return PRODUCTS associated with the trend with specified id
      * 
      * @param $id Route parameter
      * 

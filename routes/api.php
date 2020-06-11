@@ -108,10 +108,12 @@ Route::middleware('auth:api')->post('/products/mass_delete', 'ProductController@
 
 Route::middleware('auth:api')->get('/trends/gender/{gender?}', 'TrendController@index');
 Route::middleware('auth:api')->get('/trends/{id}', 'TrendController@show');
+Route::middleware('auth:api')->any('/trends/search', 'TrendController@search');
 Route::middleware('auth:api')->get('/trends/{id}/products', 'TrendController@showProducts');
 Route::middleware('auth:api')->post('/trends', 'TrendController@store');
 Route::middleware('auth:api')->post('/trends/{id}', 'TrendController@update');
 Route::middleware('auth:api')->delete('/trends/{id}', 'TrendController@delete');
+Route::middleware('auth:api')->post('/trends/mass_delete', 'TrendController@massDelete');
 
 
 /** =================================================================================================================== */
