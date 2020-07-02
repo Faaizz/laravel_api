@@ -1237,9 +1237,9 @@ class ProductController extends Controller
 
         //VALIDATION
         $rules= [
-            'name' => 'required|max:100|string',
+            'name' => 'required|max:50|string',
             'brand' => 'required|max:50|string',
-            'description' => 'required|string',
+            'description' => 'required|max:50|string',
             'section' => 'required|max:100|string',
             'sub_section' => 'required|max:50|string',
             'category' => 'required|max:50|string',
@@ -1419,9 +1419,9 @@ class ProductController extends Controller
         //VALIDATION
         $rules= [
             'id' => 'digit',
-            'name' => 'max:100|string',
+            'name' => 'max:50|string',
             'brand' => 'max:50|string',
-            'description' => 'string',
+            'description' => 'max:50|string',
             'section' => 'max:100|string',
             'sub_section' => 'max:50|string',
             'category' => 'max:50|string',

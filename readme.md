@@ -2,7 +2,6 @@
 Fully functional _REST API_ for online shopping platform built with using the _Laravel_ framework.
 The API is configured to return JSON response, and has an in-built documentation that is accessible via **HTTP OPTIONS** requests.
 
-Find a deployed version at the backend of a Java Frontend application _https://github.com/Faaizz/java_admin_frontend_
 
 ## Connect to API
 A fully-functional deployed version can be accessed at *http://faaizz.com/api*.
@@ -26,7 +25,7 @@ Basically, you just need to embed the following into an HTTP POST request as a m
 Be sure to use an HTTP client that supports cookies.  
   
 
-### Top Level Endpoints
+### Top Level Endpoint
 Make an **HTTP OPTIONS** request to the root URL at *http://faaizz.com/api* to get a list of all top level endpoints.
 
 ### Products Endpoint

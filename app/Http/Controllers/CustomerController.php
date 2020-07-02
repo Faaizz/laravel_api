@@ -672,8 +672,8 @@ class CustomerController extends Controller
 
         //SUCCESS AUTHENTICATION       
         
-        //If user sets "remember" to "yes", generate a cookie, store in database and send back to user
-        if( $request->remember == "yes" ){
+        //If user sets "remember" to "yes", OR "remember me" checkbox is marked, generate a cookie, store in database and send back to user
+        if( ($request->remember == "yes") || ($request->has("remember-me")) ){
 
             //Generate Token
             $token= Str::random(100);
@@ -688,7 +688,7 @@ class CustomerController extends Controller
             //Verify saving success
             $save_success= ($customer_login->remember_token == $token);
 
-            //If token was saved successfully, send as a "X-REMMEBER" cookie with the response
+            //If token was saved successfully, send as a "X-REMEMBER" cookie with the response
             if($save_success){
 
                 return response()->json([

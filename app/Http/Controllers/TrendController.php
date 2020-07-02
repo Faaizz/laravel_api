@@ -524,9 +524,9 @@ class TrendController extends Controller
 
         //VALIDATION
         $rules= [
-            'name' => 'required|max:100|string',
+            'name' => 'required|max:50|string',
             'gender' => 'required|max:20|string',
-            'description' => 'required|string',
+            'description' => 'required|max:50|string',
             'image_one' => 'required|mimes:jpeg,gif,png',
             'image_two' => 'mimes:jpeg,gif,png',
             'image_three' => 'mimes:jpeg,gif,png'
@@ -620,7 +620,7 @@ class TrendController extends Controller
 
         //VALIDATE SEARCH DATA
         $rules= [
-            'name' => 'max:100|string',
+            'name' => 'max:50|string',
             'gender' => 'max:50|string'
         ];
 
@@ -708,7 +708,7 @@ class TrendController extends Controller
         //VALIDATION
         $rules= [            
             'gender' => 'max:20|string',
-            'description' => 'string',
+            'description' => 'max:50|string',
             'image_one' => 'mimes:jpeg,gif,png',
             'image_two' => 'mimes:jpeg,gif,png',
             'image_three' => 'mimes:jpeg,gif,png'

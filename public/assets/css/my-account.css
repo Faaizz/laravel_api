@@ -1,0 +1,15 @@
+.account-options {
+  padding: 10px;
+}
+
+.account-options a {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+/* ORDERS FIX */
+.clean-block.clean-catalog .products .row:first-of-type {
+  border: 1px solid #e8e6e6!important;
+}
+

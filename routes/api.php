@@ -31,6 +31,10 @@ Route::get('test', function(Request $request){
 Route::options('/', 'RootController@options')
         ->name('root');
 
+Route::get('/', function(){
+        return view('api.instructions');
+});
+
 
 /** =================================================================================================================== */
 

@@ -1,0 +1,55 @@
+.nav-link-icon-big {
+  font-size: large!important;
+}
+
+@media (min-width: 992px) {
+  .nav-category-seperator-margin {
+    margin-right: 80px!important;
+  }
+}
+
+.nav-icon-hide {
+  display: none;
+}
+
+@media (min-width: 992px) {
+  .nav-text-lg-hide {
+    display: none;
+  }
+}
+
+@media (min-width: 992px) {
+  .nav-icon-lg-show {
+    display: inline;
+  }
+}
+
+.breadcrumb {
+  font-size: small;
+}
+
+.breadcrumb-link {
+  color: gray!important;
+}
+
+.breadcrumb-link:hover {
+  color: black!important;
+}
+
+.pagination a {
+  color: grey;
+}
+
+.pagination a:hover {
+  color: black;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: grey;
+  border-color: grey;
+}
+
+.dropdown-menu.small-dropdown * {
+  font-size: small;
+}
+

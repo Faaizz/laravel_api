@@ -1,0 +1,48 @@
+/* I  M P O R T   F O N T */
+@font-face {
+  font-family: vni;
+  src: url(../fonts/Vnhltfap.ttf);
+}
+
+.container a.logo{
+  font-family: vni!important;
+  text-transform: uppercase;
+}
+
+.main-featured-div-background {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+a {
+  color: inherit;
+}
+
+a:hover {
+  color: inherit;
+}
+
+/*  T R E N D I N G */
+/*Capitalize Trend Name*/
+section.trending .card-title{
+  text-transform: capitalize;
+}
+
+
+/* L I K E D  I T E M S */
+.liked-items>*{
+  border-bottom: 1px solid gray;
+}
+.liked-items>.product:last-child{
+  border-bottom: none;
+}
+
+
+/* S H O P P I N G  C A R T */
+.cart-quantity-input, .cart-quantity-input:focus{
+  outline: none!important;
+}
+
+/* P R O D U C T S */
+.form-check-input:hover, .form-check-label:hover{
+  cursor: pointer;
+}

@@ -26,6 +26,16 @@ class Customer extends Authenticatable
        'updated_at'
     ];
 
+    protected $fillable=[
+        'first_name',
+        'last_name',
+        'email',
+        'gender',
+        'address',
+        'password',
+        'phone_numbers'
+    ];
+
     /**
      * The attributes that should be cast to native types.
      *

@@ -56,8 +56,14 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS'),
+        'name' => env('MAIL_FROM_NAME'),
+    ],
+
+    /** SET REPLT-TO ADDRESS */
+    'reply_to' => [
+        'address' => env('REPLY_TO_ADDRESS'),
+        'name' => env('REPLY_TO_NAME'),
     ],
 
     /*

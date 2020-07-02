@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
+use App\Customer;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -28,7 +28,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -49,9 +49,14 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'first_name' => 'required|max:50|string',
+            'last_name' => 'required|max:50|string',
+            'email' => 'required|max:100|string',
+            'password' => 'required|max:250|string|confirmed',
+            'password_confirmation' => 'required|max:250|string',
+            'address' => 'required|string',
+            'gender' => 'required|max:10|string',
+            'phone_numbers' => 'required|digits:11'
         ]);
     }
 
@@ -59,14 +64,21 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \App\User
+     * @return \App\Customer
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        
+        return Customer::create(
+            [
+                "first_name"=> $data['first_name'],
+                "last_name"=> $data['last_name'],
+                "email"=> $data['email'],
+                "password"=> Hash::make($data['password']),
+                "address"=> $data['address'],
+                "gender"=> $data['gender'],
+                "phone_numbers"=> \json_encode( [$data['phone_numbers']])
+            ]
+        );
     }
 }
