@@ -17,7 +17,7 @@
                     <h2 class="text-info section-heading">Instructions</h2>
                     <div class="text-left">
                         <div>
-                            Fully functional _REST API_ for online shopping platform built with using the _Laravel_ framework.
+                            Fully functional REST API for online shopping platform built with using the Laravel PHP framework.
                             The API is configured to return JSON response, and has an in-built documentation that is accessible via <strong>HTTP OPTIONS</strong> requests.
                         </div>
                         

@@ -35,6 +35,9 @@ Route::get('/', function(){
         return view('api.instructions');
 });
 
+Route::get('/unauthenticated', function(){
+        return response()->json(["msg"=> "Unauthenticated"], 401);
+})->name("unauthenticated");
 
 /** =================================================================================================================== */
 
@@ -344,3 +347,17 @@ Route::middleware('auth:api')->post('/orders/mass_delete', 'OrderController@mass
 
 //DELETE SETTING
 Route::middleware('auth:api')->delete('/settings/{name}', 'SettingController@delete');
+
+
+
+/** =================================================================================================================== */
+
+/**
+ *  F  A  L  L  B  A  C  K      R   O   U   T   E 
+ */
+
+
+Route::fallback(function(){
+        return response()->json([
+            'message' => 'Page Not Found.'], 404);
+    });
