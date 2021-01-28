@@ -35,9 +35,9 @@ Route::get('/', function(){
         return view('api.instructions');
 });
 
-Route::get('/unauthenticated', function(){
-        return response()->json(["msg"=> "Unauthenticated"], 401);
-})->name("unauthenticated");
+Route::get('/unauthorized', function(){
+        return response()->json(["message"=> "Unauthorized. Please provide bearer token"], 401);
+})->name("unauthorized");
 
 /** =================================================================================================================== */
 
