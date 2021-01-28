@@ -56,6 +56,7 @@ class ProductController extends Controller
                     'args' => [
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             '' => [
                                 'required' => true,
                                 'description' => '',
@@ -64,6 +65,7 @@ class ProductController extends Controller
                         ],
 
                         'GET' => [
+                            'description' => "Query parameters",
                             '' => [
                                 'required' => true,
                                 'description' => '',
@@ -72,6 +74,7 @@ class ProductController extends Controller
                         ],
 
                         'POST' => [
+                            'description' => "POST parameters",
                             '' => [
                                 'required' => true,
                                 'description' => '',
@@ -150,6 +153,7 @@ class ProductController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
@@ -163,9 +167,10 @@ class ProductController extends Controller
                         ],
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'section' => [
                                 'required' => false,
-                                'description' => 'Product section',
+                                'description' => 'Product section. Available sections are ""',
                                 'type' => 'string'
                             ],
 
@@ -238,6 +243,7 @@ class ProductController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
@@ -251,6 +257,7 @@ class ProductController extends Controller
                         ],
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
 
                             'weeks' => [
                                 'required' => false,
@@ -334,6 +341,7 @@ class ProductController extends Controller
                     'args' => [
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'id' => [
                                 'required' => true,
                                 'description' => 'product id',
@@ -379,6 +387,7 @@ class ProductController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
@@ -392,6 +401,7 @@ class ProductController extends Controller
                         ],
 
                         'POST' => [
+                            'description' => "POST parameters",
 
                             'section' => [
                                 'required' => true,
@@ -520,6 +530,7 @@ class ProductController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
@@ -533,6 +544,7 @@ class ProductController extends Controller
                         ],
 
                         'POST' => [
+                            'description' => "POST parameters",
 
                             'name' => [
                                 'required' => true,
@@ -677,6 +689,7 @@ class ProductController extends Controller
                     'args' => [
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
 
                             'id' => [
                                 'required' => true,
@@ -687,6 +700,7 @@ class ProductController extends Controller
                         ],
 
                         'POST' => [
+                            'description' => "POST parameters",
 
                             'name' => [
                                 'required' => false,
@@ -832,6 +846,7 @@ class ProductController extends Controller
                     'args' => [
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
 
                             'id' => [
                                 'required' => true,
@@ -870,6 +885,7 @@ class ProductController extends Controller
                     'args' => [
 
                         'POST' => [
+                            'description' => "POST parameters",
 
                             'ids' => [
                                 'required' => true,

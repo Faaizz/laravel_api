@@ -150,6 +150,7 @@ class StaffController extends Controller
                     ],
                     'args' => [
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
@@ -274,6 +275,7 @@ class StaffController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',

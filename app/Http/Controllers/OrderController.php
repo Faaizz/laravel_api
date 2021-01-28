@@ -70,6 +70,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
@@ -142,6 +143,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
@@ -217,6 +219,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
@@ -289,6 +292,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
@@ -365,6 +369,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'status' => [
                                 'required' => false,
                                 'description' => 'Order status',
@@ -383,6 +388,7 @@ class OrderController extends Controller
                         ],
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'email' => [
                                 'required' => true,
                                 'description' => 'customer email',
@@ -457,6 +463,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
 
                             'status' => [
                                 'required' => false,
@@ -476,6 +483,7 @@ class OrderController extends Controller
                         ],
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'email' => [
                                 'required' => true,
                                 'description' => 'staff email',
@@ -547,6 +555,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
 
                             'status' => [
                                 'required' => false,
@@ -566,6 +575,7 @@ class OrderController extends Controller
                         ],
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'id' => [
                                 'required' => true,
                                 'description' => 'product id',
@@ -640,6 +650,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'id' => [
                                 'required' => true,
                                 'description' => 'order id',
@@ -692,6 +703,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'POST' => [
+                            'description' => "POST parameters",
 
                             'product_id' => [
                                 'required' => true,
@@ -764,6 +776,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'id' => [
                                 'required' => true,
                                 'description' => 'Order id',
@@ -772,6 +785,7 @@ class OrderController extends Controller
                         ],
 
                         'POST' => [
+                            'description' => "POST parameters",
                             'status' => [
                                 'required' => true,
                                 'description' => 'New status to set',
@@ -852,6 +866,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'id' => [
                                 'required' => true,
                                 'description' => 'Order id',
@@ -889,6 +904,7 @@ class OrderController extends Controller
                     'args' => [
 
                         'POST' => [
+                            'description' => "POST parameters",
                             'ids' => [
                                 'required' => true,
                                 'description' => 'ids of orders to delete',

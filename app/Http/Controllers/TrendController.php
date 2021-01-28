@@ -68,6 +68,7 @@ class TrendController extends Controller
                     ],
                     'args' => [
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'gender' => [
                                 'required' => false,
                                 'description' => 'gender trends to pull',
@@ -125,6 +126,7 @@ class TrendController extends Controller
                     ],
                     'args' => [
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'id' => [
                                 'required' => true,
                                 'description' => 'id of trend to pull',
@@ -165,6 +167,7 @@ class TrendController extends Controller
                     ],
                     'args' => [
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'id' => [
                                 'required' => true,
                                 'description' => 'id of trend to pull',
@@ -232,6 +235,7 @@ class TrendController extends Controller
                     ],
                     'args' => [
                         'POST' => [
+                            'description' => "POST parameters",
                             'name' => [
                                 'required' => true,
                                 'description' => 'Trend name',
@@ -305,6 +309,7 @@ class TrendController extends Controller
                     ],
                     'args' => [
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'id' => [
                                 'required' => true,
                                 'description' => 'Trend id',
@@ -312,6 +317,7 @@ class TrendController extends Controller
                             ]
                         ],
                         'POST' => [
+                            'description' => "POST parameters",
                             'description' => [
                                 'required' => false,
                                 'description' => 'Trend description',
@@ -378,6 +384,7 @@ class TrendController extends Controller
                     ],
                     'args' => [
                         'ROUTE' => [
+                            'description' => "Route parameters",
                             'id' => [
                                 'required' => true,
                                 'description' => 'Trend id',

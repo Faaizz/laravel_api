@@ -66,6 +66,7 @@ class CustomerController extends Controller
                     'args' => [
 
                         'POST' => [
+                            'description' => "POST parameters",
 
                             'email' => [
                                 'required' => true,
@@ -116,6 +117,7 @@ class CustomerController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'customer email',
@@ -175,6 +177,7 @@ class CustomerController extends Controller
                     'args' => [
 
                         'GET' => [
+                            'description' => "Query parameters",
                             'page' => [
                                 'required' => false,
                                 'description' => 'current page',
@@ -183,6 +186,7 @@ class CustomerController extends Controller
                         ],
 
                         'POST' => [
+                            'description' => "POST parameters",
 
                             'first_name' => [
                                 'required' => false,
@@ -343,6 +347,7 @@ class CustomerController extends Controller
                     'args' => [
 
                         'POST' => [
+                            'description' => "POST parameters",
 
                             'first_name' => [
                                 'required' => true,
@@ -421,6 +426,7 @@ class CustomerController extends Controller
                     'args' => [
 
                         'POST' => [
+                            'description' => "POST parameters",
 
                             'first_name' => [
                                 'required' => false,

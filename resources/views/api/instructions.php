@@ -14,11 +14,13 @@
         <section class="clean-block about-us">
             <div class="container">
                 <div class="block-heading">
-                    <h2 class="text-info section-heading">Instructions</h2>
+                    <h2 class="text-info section-heading">REST API</h2>
                     <div class="text-left">
                         <div>
-                            Fully functional REST API for online shopping platform built with using the Laravel PHP framework.
-                            The API is configured to return JSON response, and has an in-built documentation that is accessible via <strong>HTTP OPTIONS</strong> requests.
+                            Fully functional REST API of an online shopping platform built with using the Laravel PHP framework and populated with dummy data.
+                            The API is configured to return and receive JSON payload, and has an in-built documentation that is accessible via <strong>HTTP OPTIONS</strong> requests.
+                            <br/>
+                            Usage guide can be found on the <a href="https://github.com/Faaizz/laravel_api">GitHub repository<a/>
                         </div>
                         
                     </div>
